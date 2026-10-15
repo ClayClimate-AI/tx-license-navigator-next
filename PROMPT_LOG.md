@@ -1,3 +1,33 @@
+<p align="center"><img src="docs/assets/banner.png" alt="TX License Navigator banner" width="100%"></p>
+<h1 align="center">Prompt Log</h1>
+<p align="center"><b>TX License Navigator</b> · Week 5 · Claude Code · claude-opus-5-5</p>
+
+---
+
+## Legend
+
+🟦 Entry (<code>app/layout.tsx</code>, <code>app/page.tsx</code>)<br>
+🟩 UI (<code>components/*.tsx</code>, <code>lib/counties.ts</code>)<br>
+🟥 Server (<code>app/api/**/route.ts</code>)<br>
+🟫 TDLR (<code>lib/tdlr.ts</code>)<br>
+⬛ Database (<code>prisma/schema.prisma</code>, <code>prisma.config.ts</code>, <code>lib/db.ts</code>, Neon)<br>
+🟧 Style (<code>app/globals.css</code>, <code>tailwindcss</code>)<br>
+🟪 Tools (<code>next.config.ts</code>, <code>tsconfig.json</code>, <code>next</code>, <code>prisma</code> CLI)<br>
+🟨 Dependencies (<code>package.json</code>, <code>package-lock.json</code>)
+
+---
+
+## Project info
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>One liner</b></td><td>Second Chance License Navigator shows how many people hold a license in any Texas county, using live TDLR data, and keeps a watchlist of saved searches so job seekers can track local demand before they train.</td></tr>
+  <tr><td><b>Privacy</b></td><td>counts only, never a personal license row; the watchlist stores only license type, county, label and note</td></tr>
+  <tr><td><b>Tools</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+</table>
+
+---
+
 ## Entry 1 · #1 Scaffold Next.js
 
 *Oct 14 · 17:48 to 19:15 CT*
@@ -269,7 +299,7 @@ flowchart TD
       <li>by 05:44 CT · Joseph reloaded <code>localhost:3000</code>: three header bands and navy footer with the <code>data.texas.gov</code> link (screenshot)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>e77383f</code> feat: week 4 header bands and footer</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the page shows the Week 4 header bands and footer</li>
@@ -314,4 +344,156 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+---
+
+## Entry 5 · #1 TrustNote, h1 and intro
+
+*Oct 15 · ~05:50 to 06:01 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step 5 only: port the Week 4 trust note to 🟩 <code>components/TrustNote.tsx</code>, add the Week 4 h1 and intro to 🟦 <code>app/page.tsx</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>same as Entry 1</li>
+      <li>Week 4 <code>src/components/TrustNote.jsx</code> and <code>src/App.jsx</code> (via <code>gh api</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 1 edited
+    <ul>
+      <li>🟩 <code>components/TrustNote.tsx</code> (new) · green counts only note, copied from Week 4</li>
+      <li>🟦 <code>app/page.tsx</code> (modified) · h1 "Look up HVAC license demand by county", intro line, <code>&lt;TrustNote /&gt;</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npm run lint</code> passed</li>
+      <li><code>npx tsc --noEmit</code> passed</li>
+      <li>06:01 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the top of the page reads exactly like Week 4, including the counts only promise</li>
+      <li>Input: none; all static</li>
+      <li>Output: h1, intro line and green trust note inside <code>&lt;main&gt;</code></li>
+      <li>Flow: browser requests <code>/</code> → 🟦 <code>app/layout.tsx</code> → 🟦 <code>app/page.tsx</code> → 🟩 <code>SiteHeader</code> → h1, intro, 🟩 <code>TrustNote</code> → 🟩 <code>SiteFooter</code> → HTML</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>we added a new component which was the trust note. it's very simple but very important something that we adopted in week four.</li>
+      <li>There's a green box that promises counts only, never names, addresses or license records</li>
+      <li><code>page.tsx</code> now has the week foreheading Look up license by demand by county and the intro line above it with the same color and sizes with the header, footer, and trust note in place.</li>
+      <li>The page can be check side by side against week 4, and that was the planned to originally pick up where we left off.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 5 · #1 TrustNote, h1 and intro</b>
+    <ul>
+      <li>What it is: the welcome sign inside the front door, plus a promise posted on the wall</li>
+      <li>Why: the counts only rule is the project's privacy promise, so the visitor reads it before searching</li>
+      <li>Files:
+        <ul>
+          <li>🟩 <code>components/TrustNote.tsx</code>: the green promise box</li>
+          <li>🟦 <code>app/page.tsx</code>: heading, intro, and the order of everything on the page</li>
+        </ul>
+      </li>
+      <li>Its role in the project: completes the Week 4 look above the form; #6 adds the search form under it</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 5 call graph
+
+```mermaid
+flowchart TD
+  B[Browser<br/>requests /]:::run --> L[app/layout.tsx<br/>html shell, globals.css]:::entry
+  L --> P[app/page.tsx<br/>h1, intro, page order]:::entry
+  P --> H[SiteHeader.tsx<br/>three bands]:::ui
+  P --> T[TrustNote.tsx<br/>counts only promise]:::ui
+  P --> F[SiteFooter.tsx<br/>TDLR source]:::ui
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+---
+
+## Entry 6 · #1 PROMPT_LOG header
+
+*Oct 15 · ~06:02 to 06:08 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step 6 only: add the banner, title, 8-layer legend and Project info table to the top of <code>PROMPT_LOG.md</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>same as Entry 1</li>
+      <li>Week 4 <code>PROMPT_LOG.md</code> header and <code>docs/assets/banner.png</code> (via <code>gh api</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 1 edited
+    <ul>
+      <li><code>docs/assets/banner.png</code> (new) · copied from the Week 4 repo, 1280 × 720</li>
+      <li><code>PROMPT_LOG.md</code> (modified) · banner, title, legend from <code>CLAUDE.md</code>, Project info (One liner, Privacy, Tools)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>file docs/assets/banner.png</code>: PNG image data, 1280 x 720</li>
+      <li>06:08 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the log opens like Week 4, so a grader sees the layers and the project at a glance</li>
+      <li>Input: Week 4 header layout, <code>CLAUDE.md</code> legend, banner image</li>
+      <li>Output: banner, title, 8-layer legend and Project info table above Entry 1</li>
+      <li>Flow: GitHub renders <code>PROMPT_LOG.md</code> → <code>&lt;img&gt;</code> loads <code>docs/assets/banner.png</code> → legend and table → Entries 1 to 6</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>So in step six it was pretty simple. we just added the banner from week four. so now that the prompt log has that banner it matches the week four layout.</li>
+      <li>it has the title with tool and model the legend is the eight color code layers that we're using to kind of break down Down all the different parts, components, and functionality in the call graph, and also notes that are associated with With each part that we're working on within that particular area of the prompt log.</li>
+      <li>the banner image is copied from the week four repo. we have an assets folder that it was placed in and this pretty much closes the issue number one.</li>
+      <li>We're going to check this in GitHub and then proceed to updating the log and checking GitHub for next steps Regarding the issues</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 6 · #1 PROMPT_LOG header</b>
+    <ul>
+      <li>What it is: the cover page and table of contents for the build diary</li>
+      <li>Why: the legend's color squares are the same ones used in every entry and call graph, so a reader learns them once at the top</li>
+      <li>Files:
+        <ul>
+          <li><code>PROMPT_LOG.md</code>: banner, title, legend, Project info, then the entries</li>
+          <li><code>docs/assets/banner.png</code>: the picture at the top</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the graded evidence that Joseph steered each step; every later entry goes under this header</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 6 call graph
+
+```mermaid
+flowchart TD
+  G[GitHub<br/>renders the log]:::run --> L[PROMPT_LOG.md<br/>header, then entries]:::run
+  L --> I[docs/assets/banner.png<br/>banner image]:::run
+  L --> K[Legend<br/>8 layers from CLAUDE.md]:::run
+  L --> E[Entries 1 to 6<br/>one per step]:::run
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```

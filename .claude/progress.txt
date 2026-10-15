@@ -1,4 +1,4 @@
 stage: B
-step: B1 (4 of 6)
+step: B1 (6 of 6)
 issue: #1
-title: SiteHeader and SiteFooter
+title: PROMPT_LOG header
