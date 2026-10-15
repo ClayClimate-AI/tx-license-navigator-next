@@ -43,6 +43,13 @@ yarn-error.log*
 # netlify
 .netlify
 
+# command center logs
+.claude/activity.jsonl
+.claude/timeline.jsonl
+.claude/session.json
+.claude/usage.json
+.claude/*.tmp
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
