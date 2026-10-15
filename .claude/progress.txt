@@ -1,0 +1,4 @@
+stage: B
+step: B1 (2 of 6)
+issue: #1
+title: .gitignore and .env.example

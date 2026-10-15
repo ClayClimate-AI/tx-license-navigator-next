@@ -1,0 +1,263 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Skill Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column like a field manual; a lookup table first, then the flow as numbered stages, then rules. */
+:root {
+  --bg: #F3F5F8;
+  --surface: #FFFFFF;
+  --fg: #1B2733;
+  --muted: #4A5A6A;
+  --navy: #14304F;
+  --blue: #1F5C99;
+  --stripe: #A3243B;
+  --line: #C7D0DB;
+  --tag-bg: #E6EEF7;
+  --tag-fg: #14304F;
+  --warn-bg: #FFFBEB;
+  --warn-line: #E3C46B;
+  --ok-bg: #EAF2E6;
+  --ok-line: #2D5A27;
+  --code-bg: #EEF2F6;
+  --focus: #F2B807;
+  --display: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1720; --surface: #16212D; --fg: #E4EAF1; --muted: #A3B1C0;
+    --navy: #9CC2EA; --blue: #7FB2E5; --stripe: #E0697F; --line: #2C3B4B;
+    --tag-bg: #1E3248; --tag-fg: #CFE0F2; --warn-bg: #2A2410; --warn-line: #8C7330;
+    --ok-bg: #16261A; --ok-line: #6FA765; --code-bg: #1D2A38; --focus: #F2B807;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1720; --surface: #16212D; --fg: #E4EAF1; --muted: #A3B1C0;
+  --navy: #9CC2EA; --blue: #7FB2E5; --stripe: #E0697F; --line: #2C3B4B;
+  --tag-bg: #1E3248; --tag-fg: #CFE0F2; --warn-bg: #2A2410; --warn-line: #8C7330;
+  --ok-bg: #16261A; --ok-line: #6FA765; --code-bg: #1D2A38; --focus: #F2B807;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 0 64px; }
+header.band { border-bottom: 4px solid var(--stripe); padding-block: 28px 20px; margin-bottom: 28px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 38px); line-height: 1.15; color: var(--navy); margin: 6px 0 10px; text-wrap: balance; }
+.lede { max-width: 65ch; color: var(--muted); margin: 0; }
+h2 { font-family: var(--display); font-weight: 800; font-size: 22px; color: var(--navy); margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 17px; margin: 0; color: var(--fg); }
+p { max-width: 68ch; }
+code, .cmd { font-family: var(--mono); font-size: 14px; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.lookup { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); }
+.lookup th, .lookup td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.lookup th { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--bg); }
+.lookup tr:last-child td { border-bottom: 0; }
+.scroll { overflow-x: auto; }
+.t { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.cmdrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cmd { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; overflow-wrap: anywhere; }
+.copy { font: 600 12px var(--body); color: var(--blue); background: none; border: 1px solid var(--line); border-radius: 3px; padding: 2px 8px; cursor: pointer; }
+.copy:hover { border-color: var(--blue); }
+
+.stages { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: st; }
+.stage { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--blue); padding: 14px 16px; display: grid; gap: 8px; min-width: 0; }
+.stage.opt { border-left-color: var(--line); }
+.stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.num { font-family: var(--mono); font-weight: 600; color: var(--blue); font-size: 14px; }
+.tag { font-size: 12px; font-weight: 600; background: var(--tag-bg); color: var(--tag-fg); padding: 1px 8px; border-radius: 10px; }
+.meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 15px; margin: 0; }
+.meta dt { color: var(--muted); font-weight: 600; }
+.meta dd { margin: 0; min-width: 0; }
+
+.sizes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.size { background: var(--surface); border: 1px solid var(--line); padding: 12px 14px; }
+.size h3 { font-size: 15px; color: var(--navy); }
+.size p { margin: 6px 0 0; font-size: 15px; }
+
+.note { background: var(--warn-bg); border: 1px solid var(--warn-line); padding: 12px 16px; }
+.note ul { margin: 6px 0 0; padding-left: 20px; }
+.note li { margin: 4px 0; }
+.tip { background: var(--ok-bg); border-left: 4px solid var(--ok-line); padding: 12px 16px; }
+.tip p { margin: 0; }
+
+.week { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); font-size: 15px; }
+.week th, .week td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.week th { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--bg); }
+footer { margin-top: 48px; font-size: 14px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="band">
+    <div class="eyebrow">Matt Pocock skills · Claude Code · field guide</div>
+    <h1>Skill Playbook</h1>
+    <p class="lede">When to run which skill, in what order, and what to do when you're stuck. Commands marked "you type" only start when you type them. The others Claude can also start by itself.</p>
+  </header>
+
+  <h2>I'm stuck. What do I run?</h2>
+  <div class="scroll">
+  <table class="lookup">
+    <thead><tr><th scope="col">Situation</th><th scope="col">Run</th><th scope="col">Time</th></tr></thead>
+    <tbody>
+      <tr><td>I don't know which skill fits</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:ask-matt</span><button class="copy" type="button">Copy</button></div></td><td class="t">2–5 min</td></tr>
+      <tr><td>The agent's last message didn't make sense</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:wait-what</span><button class="copy" type="button">Copy</button></div></td><td class="t">Under 1 min</td></tr>
+      <tr><td>I don't understand a diff before accepting it</td><td>Ask for the tutor: "use the tutor on this diff"</td><td class="t">3–10 min per diff</td></tr>
+      <tr><td>A concept keeps confusing me (in a separate folder)</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:teach</span><button class="copy" type="button">Copy</button></div></td><td class="t">15–30 min per lesson</td></tr>
+      <tr><td>I need exact facts: versions, setup, an API</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:research</span><button class="copy" type="button">Copy</button></div></td><td class="t">15–30 min (runs in background)</td></tr>
+      <tr><td>I must click through a dashboard or copy secrets</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:wizard</span><button class="copy" type="button">Copy</button></div></td><td class="t">10–15 min, plus the setup itself</td></tr>
+      <tr><td>Something is broken and the first fix didn't work</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:diagnosing-bugs</span><button class="copy" type="button">Copy</button></div></td><td class="t">15–60 min (usually faster than guessing)</td></tr>
+      <tr><td>A design question I can't settle by talking</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:prototype</span><button class="copy" type="button">Copy</button></div></td><td class="t">30–90 min</td></tr>
+      <tr><td>A feature is finished. Did we build what the spec said?</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:code-review</span><button class="copy" type="button">Copy</button></div></td><td class="t">30–45 min with fixes</td></tr>
+      <tr><td>Git says there's a merge conflict</td><td><div class="cmdrow"><span class="cmd">/mattpocock-skills:resolving-merge-conflicts</span><button class="copy" type="button">Copy</button></div></td><td class="t">5–20 min</td></tr>
+      <tr><td>I don't know what to do next</td><td>Ask: "What's the next step, and does a skill apply?"</td><td class="t">1 min</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>The main flow, idea to shipped</h2>
+  <p>Work top to bottom. Stages with a grey edge are optional.</p>
+  <ol class="stages">
+    <li class="stage">
+      <div class="stage-head"><span class="num">0</span><h3>Set up the repo, once</h3><span class="tag">you type</span></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:setup-matt-pocock-skills</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>First time using the engineering skills in a repo.</dd><dt>Leaves</dt><dd><code>docs/agents/</code> (where tickets live) and an "Agent skills" section in <code>CLAUDE.md</code>.</dd><dt>Time</dt><dd>5–10 min. Pick "local markdown" for solo projects.</dd></dl>
+    </li>
+    <li class="stage opt">
+      <div class="stage-head"><span class="num">1</span><h3>Learn the new concepts</h3><span class="tag">you type</span></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:teach</span><button class="copy" type="button">Copy</button><span class="cmd">/mattpocock-skills:research</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>The build uses 1–3 things you've never used. Set the assignment as the mission.</dd><dt>Where</dt><dd><code>teach</code> in its own folder (e.g. <code>~/learning/prisma</code>). <code>research</code> in the repo.</dd><dt>Time</dt><dd>About 1 hour, time-boxed. Start the weekend before.</dd></dl>
+    </li>
+    <li class="stage">
+      <div class="stage-head"><span class="num">2</span><h3>Decide</h3><span class="tag">you type</span></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:grill-with-docs</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>Before any code. It interviews you until every decision is made.</dd><dt>Leaves</dt><dd><code>CONTEXT.md</code> (glossary of your project's words) and decision records.</dd><dt>Done when</dt><dd>No open questions, and you confirmed the summary.</dd><dt>Time</dt><dd>1–3 hours for a week-sized build. Less for one feature.</dd></dl>
+    </li>
+    <li class="stage opt">
+      <div class="stage-head"><span class="num">3</span><h3>Test a design question</h3></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:prototype</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>A question needs something you can click to answer: a state model, or what a screen should look like.</dd><dt>Leaves</dt><dd>Throwaway code on its own branch, plus the answer written down.</dd><dt>Time</dt><dd>30–90 min.</dd></dl>
+    </li>
+    <li class="stage">
+      <div class="stage-head"><span class="num">4</span><h3>Write the spec</h3><span class="tag">you type</span></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:to-spec</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>Right after grilling, in the same session. No new interview.</dd><dt>Skip if</dt><dd>You already have spec files (like this week's <code>docs/spec/</code>).</dd><dt>Time</dt><dd>10–15 min.</dd></dl>
+    </li>
+    <li class="stage">
+      <div class="stage-head"><span class="num">5</span><h3>Break into tickets</h3><span class="tag">you type</span></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:to-tickets</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>The build takes more than one session.</dd><dt>Leaves</dt><dd>One file per ticket. Each ticket is one thing a user can do, through every layer, and lists what blocks it.</dd><dt>Done when</dt><dd>You approved the size and order of the tickets.</dd><dt>Time</dt><dd>15–30 min.</dd></dl>
+    </li>
+    <li class="stage">
+      <div class="stage-head"><span class="num">6</span><h3>Build one ticket at a time</h3></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:implement</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>How</dt><dd>Pick a ticket whose blockers are done. Work it in small steps: ask, review the diff, accept, test, commit. <code>/clear</code> between tickets.</dd><dt>Careful</dt><dd><code>implement</code> writes tests first and commits by itself. To stay in control, say "work ticket 03 in small steps, don't commit" instead.</dd><dt>Along the way</dt><dd><code>wizard</code> for steps only you can do, <code>diagnosing-bugs</code> when stuck, <code>wait-what</code> when lost.</dd><dt>Time</dt><dd>Most of the build. Usually 1–3 hours per ticket.</dd></dl>
+    </li>
+    <li class="stage">
+      <div class="stage-head"><span class="num">7</span><h3>Check it's done</h3></div>
+      <div class="cmdrow"><span class="cmd">/mattpocock-skills:code-review</span><button class="copy" type="button">Copy</button></div>
+      <dl class="meta"><dt>When</dt><dd>When a feature is finished, and once before you ship. Not on every step; your diff review covers that.</dd><dt>Checks</dt><dd>Does the code follow your repo's rules? Does it match the spec?</dd><dt>Time</dt><dd>About 30–45 min including fixes.</dd></dl>
+    </li>
+  </ol>
+
+
+  <h2>Time budget for the process</h2>
+  <p>What the skills cost on top of writing code, for a week-sized build. Plan for it before you start.</p>
+  <div class="scroll">
+  <table class="lookup">
+    <thead><tr><th scope="col">Stage</th><th scope="col">Time</th></tr></thead>
+    <tbody>
+      <tr><td>Set up the repo (once)</td><td class="t">5–10 min</td></tr>
+      <tr><td>Learn the new concepts</td><td class="t">~1 h</td></tr>
+      <tr><td>Grill</td><td class="t">1–3 h</td></tr>
+      <tr><td>Spec and tickets</td><td class="t">25–45 min</td></tr>
+      <tr><td>Code review before shipping</td><td class="t">30–45 min</td></tr>
+      <tr><td><b>Process total</b></td><td class="t"><b>About 3–5.5 h</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="tip" style="margin-top:12px"><p>Add the process total to your build estimate, then count back from the due date. A 15–18 hour build plus 4 hours of process is a 3-day job, so start on Saturday for a Friday demo, not Wednesday.</p></div>
+
+  <h2>Size the process to the work</h2>
+  <div class="sizes">
+    <div class="size"><h3>Small fix</h3><p>Just ask. Review the diff.</p></div>
+    <div class="size"><h3>One-session feature</h3><p>Grill, then build in the same session.</p></div>
+    <div class="size"><h3>Multi-session build</h3><p>The full flow: grill, spec, tickets, build each ticket, review.</p></div>
+    <div class="size"><h3>Huge and unclear</h3><p><code>/mattpocock-skills:wayfinder</code> plans it first, then join the flow at the spec. Rare.</p></div>
+  </div>
+
+  <h2>Between stages</h2>
+  <p>At the end of a stage, choose one before you start the next:</p>
+  <div class="scroll">
+  <table class="lookup">
+    <thead><tr><th scope="col">Choice</th><th scope="col">When</th></tr></thead>
+    <tbody>
+      <tr><td>Keep going</td><td>The next stage needs what's in this conversation. Stay in one session from grilling through tickets.</td></tr>
+      <tr><td><code>/clear</code></td><td>Between tickets. The ticket file and <code>CLAUDE.md</code> carry everything needed.</td></tr>
+      <tr><td><code>/compact</code></td><td>The session is getting long but you still need its thinking.</td></tr>
+      <tr><td><code>/mattpocock-skills:handoff</code></td><td>Moving to a different folder, tool, or person.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Rules that save you trouble</h2>
+  <div class="note">
+    <ul>
+      <li>Skills marked "you type" never start on their own. If you want one, type it.</li>
+      <li>Run <code>teach</code> outside your app's repo. It creates lesson folders wherever it runs.</li>
+      <li><code>implement</code> commits by itself. Say "don't commit" if you run git yourself.</li>
+      <li>Spec files only help while they're true. When a step changes a decision, update the spec in the same step.</li>
+      <li>If you can't hold the whole change in your head, write it down before the agent builds it.</li>
+    </ul>
+  </div>
+
+  <h2>This week: TX License Navigator</h2>
+  <p>Where each skill fires in the Week 5 build. Ticket numbers are a draft until <code>to-tickets</code> sets them.</p>
+  <div class="scroll">
+  <table class="week">
+    <thead><tr><th scope="col">When</th><th scope="col">Skill</th><th scope="col">Why</th><th scope="col">Time</th></tr></thead>
+    <tbody>
+      <tr><td>Before tickets</td><td><code>setup-matt-pocock-skills</code>, then <code>to-tickets docs/spec/</code></td><td>The spec already exists, so skip <code>to-spec</code>.</td><td class="t">30–40 min</td></tr>
+      <tr><td>Database ticket, first</td><td><code>research</code></td><td>Prisma 7 + Neon setup facts, with sources.</td><td class="t">+20–30 min</td></tr>
+      <tr><td>Database ticket</td><td><code>wizard</code></td><td>Neon account, dev branch, connection strings into <code>.env</code>.</td><td class="t">+10–15 min</td></tr>
+      <tr><td>Any ticket</td><td>tutor, <code>wait-what</code>, <code>diagnosing-bugs</code></td><td>When a diff, a message, or the app doesn't make sense.</td><td class="t">As needed</td></tr>
+      <tr><td>Done-check ticket</td><td><code>code-review</code></td><td>Code against <code>docs/spec/</code> before deploying.</td><td class="t">+30–45 min</td></tr>
+      <tr><td>Deploy ticket</td><td><code>wizard</code></td><td>Netlify env vars and the migration to Neon main.</td><td class="t">+10–15 min</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="tip" style="margin-top:20px"><p>This week the skills add about 1.5–2 hours in total, and save some of it back. Next week: start with stage 1 (<code>teach</code>) on the weekend, then run the flow from stage 2.</p></div>
+
+  <footer>Based on the router skill <code>ask-matt</code> in mattpocock-skills 1.2.3. When this guide and that skill disagree, the skill wins.</footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var text = btn.previousElementSibling.textContent.trim();
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(btn.previousElementSibling);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Press Ctrl/Cmd+C';
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  });
+});
+</script>
+
+</body></html>
