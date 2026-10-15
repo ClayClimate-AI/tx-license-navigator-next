@@ -190,7 +190,7 @@ flowchart TD
       <li>~20:50 CT · Joseph pressed Tab at <code>localhost:3000</code>: yellow ring on "Documentation", gray background below the starter box (screenshot)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>56b7a88</code> style: week 4 background, text color and focus ring</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: every page gets the Week 4 background, text color and keyboard focus ring</li>
@@ -235,4 +235,83 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
   classDef css fill:#c2410c,color:#fff,stroke:#fdba74
+```
+
+---
+
+## Entry 4 · #1 SiteHeader and SiteFooter
+
+*Oct 15 · by 05:44 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step 4 only: port the Week 4 header bands and footer to 🟩 <code>components/SiteHeader.tsx</code> and 🟩 <code>components/SiteFooter.tsx</code>, show them on the page</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>same as Entry 1</li>
+      <li>Week 4 <code>src/components/SiteHeader.jsx</code> and <code>src/components/SourceNote.jsx</code> (via <code>gh api</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 new files, 1 edited
+    <ul>
+      <li>🟩 <code>components/SiteHeader.tsx</code> (new) · navy strip, blue title band, red stripe</li>
+      <li>🟩 <code>components/SiteFooter.tsx</code> (new) · Week 4 <code>SourceNote</code>; per-link focus classes dropped, the global ring covers them</li>
+      <li>🟦 <code>app/page.tsx</code> (modified) · starter page replaced by header, empty <code>main</code>, footer</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npm run lint</code> passed</li>
+      <li><code>npx tsc --noEmit</code> passed</li>
+      <li>by 05:44 CT · Joseph reloaded <code>localhost:3000</code>: three header bands and navy footer with the <code>data.texas.gov</code> link (screenshot)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the page shows the Week 4 header bands and footer</li>
+      <li>Input: none; both components are static</li>
+      <li>Output: a <code>&lt;header&gt;</code> with three bands and a <code>&lt;footer&gt;</code> with the TDLR source link</li>
+      <li>Flow: browser requests <code>/</code> → 🟦 <code>app/layout.tsx</code> → 🟦 <code>app/page.tsx</code> → 🟩 <code>SiteHeader</code>, empty <code>&lt;main&gt;</code>, 🟩 <code>SiteFooter</code> → HTML</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>So for step four we added the header and the footer bands to the page.</li>
+      <li>These are similar to the theme and the setup in week four.</li>
+      <li>We reloaded the local host 3000 to check them and then accepted step four and provided a reflection upon it.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 4 · #1 SiteHeader and SiteFooter</b>
+    <ul>
+      <li>What it is: the sign over the front door and the plaque by the exit, moved from the Week 4 house</li>
+      <li>Why: each band is its own component, so <code>page.tsx</code> stays short and the look matches Week 4 exactly</li>
+      <li>Files:
+        <ul>
+          <li>🟩 <code>components/SiteHeader.tsx</code>: the three bands at the top</li>
+          <li>🟩 <code>components/SiteFooter.tsx</code>: where the numbers come from, not legal advice</li>
+          <li>🟦 <code>app/page.tsx</code>: places header, main, footer in order</li>
+        </ul>
+      </li>
+      <li>Its role in the project: frames every later piece (search form, saved list) between the same header and footer</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 4 call graph
+
+```mermaid
+flowchart TD
+  B[Browser<br/>requests /]:::run --> L[app/layout.tsx<br/>html shell, globals.css]:::entry
+  L --> P[app/page.tsx<br/>header, main, footer]:::entry
+  P --> H[SiteHeader.tsx<br/>three bands]:::ui
+  P --> M[main<br/>empty until step 5]:::entry
+  P --> F[SiteFooter.tsx<br/>TDLR source, not legal advice]:::ui
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```
