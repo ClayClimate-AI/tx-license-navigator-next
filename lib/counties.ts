@@ -19,3 +19,6 @@ export const COUNTIES = [
 
 // "HARRIS" | "DALLAS" | ... : lets TypeScript and Zod (B2.8) accept only these 13 values.
 export type CountyValue = (typeof COUNTIES)[number]["value"];
+
+// The 13 values on their own, for z.enum. Built from COUNTIES so the list is written once.
+export const COUNTY_VALUES = COUNTIES.map((c) => c.value);

@@ -68,7 +68,7 @@ Legend: exactly 8 layers. Things outside the code (Browser, TDLR API) use `run` 
 |---|---|---|---|
 | 🟦 Entry | `app/layout.tsx`, `app/page.tsx` | `entry` | `fill:#1d4ed8,color:#fff,stroke:#93c5fd` |
 | 🟩 UI | `components/*.tsx`, `lib/counties.ts` | `ui` | `fill:#15803d,color:#fff,stroke:#86efac` |
-| 🟥 Server | `app/api/**/route.ts` | `server` | `fill:#b91c1c,color:#fff,stroke:#fca5a5` |
+| 🟥 Server | `app/api/**/route.ts`, `lib/validation.ts` | `server` | `fill:#b91c1c,color:#fff,stroke:#fca5a5` |
 | 🟫 TDLR | `lib/tdlr.ts` | `tdlr` | `fill:#78350f,color:#fff,stroke:#d6a77a` |
 | ⬛ Database | `prisma/schema.prisma`, `prisma.config.ts`, `lib/db.ts`, Neon | `db` | `fill:#111827,color:#fff,stroke:#9ca3af` |
 | 🟧 Style | `app/globals.css`, `tailwindcss` | `css` | `fill:#c2410c,color:#fff,stroke:#fdba74` |

@@ -78,10 +78,10 @@ model SavedSearch {
 
 | Schema | Rules |
 |---|---|
-| `idParam` | coerces to an integer ≥ 1. `"abc"`, `"1.5"`, `"0"` fail. [E1] |
-| `countQuery` | `type`: trimmed string, 1–100 chars. `county`: one of the `lib/counties.ts` values. `break`: optional, only `"column"`. |
-| `createBody` | `licenseType` as `type` above, `county` as above, `label`: trimmed, 1–80, `note`: trimmed, 0–280, empty becomes `null`. [C3] |
-| `updateBody` | `label` and `note` only, same rules. Extra keys are rejected. [U2] |
+| `idParam` | coerces to an integer from 1 to 2147483647 (the Postgres `INT` maximum, so a huge id is a 400, not a 500). `"abc"`, `"1.5"`, `"0"` fail. [E1] |
+| `countQuery` | `type`: trimmed string, 1–100 chars. `county`: one of `COUNTY_VALUES` from `lib/counties.ts`. `break`: optional, only `"column"`. |
+| `createBody` | `licenseType` as `type` above, `county` as above, `label`: trimmed, 1–80, `note`: optional, trimmed, 0–280, missing or empty becomes `null`. Extra keys are rejected. [C3] |
+| `updateBody` | `label` and `note` only, both required, same rules. Extra keys are rejected. [U2] |
 
 ## API contracts 🟥
 

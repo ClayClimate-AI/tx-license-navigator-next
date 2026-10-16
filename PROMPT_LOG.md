@@ -8,7 +8,7 @@
 
 🟦 Entry (<code>app/layout.tsx</code>, <code>app/page.tsx</code>)<br>
 🟩 UI (<code>components/*.tsx</code>, <code>lib/counties.ts</code>)<br>
-🟥 Server (<code>app/api/**/route.ts</code>)<br>
+🟥 Server (<code>app/api/**/route.ts</code>, <code>lib/validation.ts</code>)<br>
 🟫 TDLR (<code>lib/tdlr.ts</code>)<br>
 ⬛ Database (<code>prisma/schema.prisma</code>, <code>prisma.config.ts</code>, <code>lib/db.ts</code>, Neon)<br>
 🟧 Style (<code>app/globals.css</code>, <code>tailwindcss</code>)<br>
@@ -1159,7 +1159,7 @@ flowchart TD
       <li>Next.js docs: a database query stops a <code>GET</code> route from being prerendered under Cache Components, so <code>GET /api/searches</code> runs per request</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>2225c5a</code> image renames and Entry 13 fix · <code>d0b4b76</code> Entry 14 (both: docs: rename reference images, fix entry 13 issue refs; prompt log entry 14)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: check the project is still on track before the last step of #2</li>
@@ -1210,6 +1210,98 @@ flowchart TD
   FI --> B28
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+## Entry 15 · #2 lib/validation.ts Zod schemas and build
+
+*Oct 16 · ~13:45 to 14:15 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.8 only: the 4 Zod schemas in <code>lib/validation.ts</code> per <code>design.md</code> and the notes approved in Entry 14, then <code>npm run build</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> Validation table; <code>docs/spec/requirements.md</code> C3, U2, E1</li>
+      <li>Joseph's decisions: <code>idParam</code> max 2147483647; strict <code>createBody</code> and <code>updateBody</code>; <code>label</code> and <code>note</code> both required on PATCH; <code>COUNTY_VALUES</code> built from <code>COUNTIES</code></li>
+      <li><code>node_modules/zod/v4/classic/schemas.d.ts</code> (<code>z.enum</code> accepts a <code>readonly string[]</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 4 modified
+    <ul>
+      <li>🟥 <code>lib/validation.ts</code> (new) · <code>idParam</code>, <code>countQuery</code>, <code>createBody</code>, <code>updateBody</code></li>
+      <li>🟩 <code>lib/counties.ts</code> (modified) · <code>COUNTY_VALUES = COUNTIES.map((c) =&gt; c.value)</code></li>
+      <li><code>docs/spec/design.md</code> (modified) · Validation rows: id max, optional note on create, extra keys rejected on create, both fields required on update</li>
+      <li><code>CLAUDE.md</code>, <code>PROMPT_LOG.md</code> (modified) · <code>lib/validation.ts</code> added to 🟥 Server in the legend</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li><code>npm run build</code>: "Generated Prisma Client (7.10.0)" · "Compiled successfully" · routes <code>/</code> and <code>/_not-found</code> static (agent's run and Joseph's run)</li>
+      <li>Joseph's build showed Prisma's "Update available 7.10.0 -&gt; 8.0.0-rc.23" box; ignored, the pin stays</li>
+      <li>Issue #2: all 6 ACs ticked; <code>Actual: 31.9 h (wall clock, includes breaks)</code> added via <code>gh issue edit</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: every route from #3 on checks input first, so bad input stops at 400 before the database</li>
+      <li>Input: the <code>id</code> text from the URL, query values, JSON bodies</li>
+      <li>Output: clean data (trimmed, empty note → <code>null</code>, id → number) or a failed parse → 400</li>
+      <li>Flow: browser → <code>route.ts</code> → <code>schema.safeParse()</code> → ✗ 400 / ✓ <code>lib/db.ts</code> → Prisma → Neon</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>We created <code>validation.ts</code>, which holds the checklists for what passes or fails. <code>createBody</code> and <code>updateBody</code> check the JSON body; <code>idParam</code> checks the id in the URL, and <code>countQuery</code> checks the search terms after the <code>?</code>.</li>
+      <li>We gave Zod a direct reference to the thirteen counties, so no county outside that list can be approved.</li>
+      <li>We updated the rules in <code>design.md</code> to match.</li>
+      <li>Then we ran a practice build to mimic what Netlify will do. It created the Prisma client and type-checked and compiled the app. It didn't run tests, because this project has no unit tests yet.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 15 · #2 lib/validation.ts Zod schemas and build</b>
+    <ul>
+      <li>What it is: the expediter's four checklists, plus a dress rehearsal of the Netlify build</li>
+      <li>Why: TypeScript checks our code before it runs; Zod checks the browser's data while it runs</li>
+      <li>Files:
+        <ul>
+          <li><code>lib/validation.ts</code>: the 4 schemas</li>
+          <li><code>lib/counties.ts</code>: <code>COUNTY_VALUES</code> for <code>z.enum</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: closes AC 6 and issue #2; every route in #3–#8 imports these schemas</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 15 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>JSON body or URL]:::run
+  RT[app/api/**/route.ts<br/>#3 onward]:::server
+  CO[lib/counties.ts<br/>COUNTY_VALUES]:::ui
+  VA[lib/validation.ts<br/>idParam · countQuery · createBody · updateBody]:::server
+  BAD[400 error]:::server
+  DB[lib/db.ts<br/>prisma]:::db
+  NEON[Neon dev]:::db
+  BLD[npm run build<br/>prisma generate + next build]:::tool
+  CO --> VA
+  BR --> RT
+  RT --> VA
+  VA --> BAD
+  VA --> DB
+  DB --> NEON
+  BLD --> VA
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
