@@ -909,7 +909,7 @@ flowchart TD
       <li>19:53 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>5174008</code> feat: init migration creates SavedSearch on neon dev; prompt log entry 11</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the table exists in a real database, so the app has somewhere to save searches</li>
@@ -958,5 +958,91 @@ flowchart TD
   CF --> NEON
   SQL --> NEON
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+## Entry 12 · #2 lib/db.ts shared Prisma client
+
+*Oct 15 · ~21:05 CT to Oct 16 · 08:57 CT (overnight break)*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 (Joseph also talked the restatement through with Grok)</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.6 only: <code>lib/db.ts</code>, one shared Prisma client that connects through the Neon adapter</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code>, <code>docs/research/prisma-7-neon.md</code></li>
+      <li><code>generated/prisma/</code> (output of <code>prisma generate</code> from B2.4)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file
+    <ul>
+      <li>⬛ <code>lib/db.ts</code> (new) · <code>server-only</code>; <code>PrismaNeon</code> adapter with pooled <code>DATABASE_URL</code>; one <code>PrismaClient</code> kept on <code>globalThis</code> in dev; <code>export const prisma</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output (types check, including the import from <code>../generated/prisma/client</code>)</li>
+      <li><code>ls generated/prisma</code>: <code>client.ts</code>, <code>models/SavedSearch.ts</code>, <code>models.ts</code>, <code>enums.ts</code>, <code>commonInputTypes.ts</code>, <code>browser.ts</code>, <code>internal/</code></li>
+      <li>No live query yet; the first one runs in #3</li>
+      <li>08:57 CT · Joseph restated the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: every route in #3 imports one ready client instead of building its own</li>
+      <li>Input: <code>DATABASE_URL</code> (pooled); the generated <code>PrismaClient</code></li>
+      <li>Output: <code>prisma</code>, a client with <code>prisma.savedSearch.create / findMany / update / delete</code></li>
+      <li>Flow: <code>route.ts</code> → <code>import { prisma } from "@/lib/db"</code> → <code>PrismaClient</code> → SQL → <code>PrismaNeon</code> adapter → <code>DATABASE_URL</code> (pooler) → Neon <code>dev</code> → row back</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The router already has the method and headers, so it knows which URL path to follow and which function (for example <code>POST</code>) to run. The only thing still on its way is the JSON body, which arrives as text because it travels over HTTP.</li>
+      <li>Once received, <code>await req.json()</code> turns that text into an object. Zod checks it, and if it passes, it reaches the Prisma client.</li>
+      <li>The client is a remote with a set of buttons (<code>create</code>, <code>findMany</code>, <code>update</code>, <code>delete</code>). <code>prisma generate</code> built those buttons from the model blueprint in the schema.</li>
+      <li>The gap is that my code speaks TypeScript and the database only understands SQL. The remote is the translator. It isn't a straight conversion: it turns the object into SQL for the specific job of the button I pressed.</li>
+      <li>That SQL travels through the adapter, over the pooled database URL, to Postgres, which runs it and stores the row.</li>
+      <li>Translating TypeScript into SQL is what any Prisma client does. What makes ours <i>shared</i> is that there's only one copy: <code>lib/db.ts</code> creates it once, keeps it on the <code>globalThis</code> shelf, and exports it, so every route imports that same one instead of building a new client per click.</li>
+      <li>That matters because each new client opens its own connections to Neon. If every request or hot reload made a new one, we'd run out of connections. One shared copy, plus the pooler behind <code>DATABASE_URL</code>, keeps that number small.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 12 · #2 lib/db.ts shared Prisma client</b>
+    <ul>
+      <li>What it is: the one remote control the whole app shares, wired to Neon's pooler</li>
+      <li>Why: Next.js reloads modules on every save in dev; without <code>globalThis</code>, each reload would open a new connection pool</li>
+      <li>Files:
+        <ul>
+          <li><code>lib/db.ts</code>: creates the adapter and client once and exports <code>prisma</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: the only door from route handlers to the database; #3 routes import it</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 12 call graph
+
+```mermaid
+flowchart TD
+  SC[prisma/schema.prisma<br/>blueprint]:::db
+  GEN[prisma generate]:::tool
+  CL[generated/prisma/client.ts<br/>PrismaClient + buttons]:::db
+  DB[lib/db.ts<br/>one shared prisma]:::db
+  RT[app/api/**/route.ts<br/>#3, not built yet]:::server
+  AD[PrismaNeon adapter<br/>pooled DATABASE_URL]:::db
+  NEON[Neon dev<br/>SavedSearch]:::db
+  SC --> GEN
+  GEN --> CL
+  CL --> DB
+  RT --> DB
+  DB --> AD
+  AD --> NEON
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
 ```

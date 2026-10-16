@@ -1,4 +1,4 @@
 stage: B
-step: B2.6 (6 of 8)
+step: B2.7 (7 of 8)
 issue: #2
-title: lib/db.ts shared Prisma client
+title: lib/counties.ts 13 counties
