@@ -1421,7 +1421,7 @@ flowchart TD
       <li>After the fix: both URLs on the <code>dev</code> endpoint, <code>DATABASE_URL</code> pooled; <code>curl</code> → <code>{"searches":[]}</code> status <code>200</code></li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>be5f8bf</code> feat: GET /api/searches returns saved searches newest first; prompt log entry 17</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the browser can ask the server for the saved list</li>
@@ -1471,4 +1471,81 @@ flowchart TD
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+## Entry 18 · #3 Rows in Neon and restart check
+
+*Oct 16 · ~17:30 to 17:50 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C1.2 only: add 2 rows by hand in Neon <code>dev</code>, check the route returns them newest first, then again after a dev server restart</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #3 ACs (rows added in Neon, newest first, survive restart); R1, R5</li>
+      <li><code>prisma/migrations/…_init/migration.sql</code> (column names and <code>NOT NULL</code> on <code>updatedAt</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    No code; data only
+    <ul>
+      <li>⬛ Neon <code>dev</code> · <code>SavedSearch</code>: id 1 HARRIS (with note, created a day earlier), id 2 TRAVIS (note <code>NULL</code>), inserted in the SQL Editor by Joseph</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>Neon SQL Editor (branch <code>dev</code>, database <code>neondb</code>): "Statement executed successfully"</li>
+      <li><code>curl /api/searches</code>: status <code>200</code>, id 2 TRAVIS then id 1 HARRIS</li>
+      <li>After Joseph restarted <code>npm run dev</code>: same <code>200</code>, same 2 rows, same order; dev log "GET /api/searches 200 in 1494ms"</li>
+      <li>A stray draft row in <code>_prisma_migrations</code> (Tables view, Add record) was discarded before saving</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: prove the route returns real rows, newest first, and that they survive a server restart [R1, R5]</li>
+      <li>Input: 2 rows inserted with SQL in Neon <code>dev</code></li>
+      <li>Output: <code>200 { searches: [TRAVIS, HARRIS] }</code> before and after the restart</li>
+      <li>Flow: SQL Editor → Neon <code>dev</code> → restart Next.js → <code>curl</code> → <code>route.ts</code> → Prisma → Neon → same JSON</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This one was pretty cool: we put real rows into the Neon database by hand, and the route returned them in the right order before and after the restart.</li>
+      <li>The first response came back in the right order, but we couldn't yet rule out that the server was answering from memory. So we restarted it and sent the request again.</li>
+      <li>Getting the same response means it really came from Neon, so the information we received before was accurate, and we'll get consistent results even when the server restarts.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 18 · #3 Rows in Neon and restart check</b>
+    <ul>
+      <li>What it is: test data added by hand, plus proof that the database, not the server, holds it</li>
+      <li>Why: POST arrives in #8, so the list needs rows to show now; the restart rules out server memory</li>
+      <li>Files: none; 2 rows in Neon <code>dev</code></li>
+      <li>Its role in the project: the cards in C1.3 and C1.4 render these 2 rows, including the one with no note</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 18 call graph
+
+```mermaid
+flowchart TD
+  SQL[Neon SQL Editor<br/>INSERT 2 rows]:::run
+  NEON[Neon dev<br/>SavedSearch]:::db
+  DEV[npm run dev<br/>restarted]:::tool
+  CURL[curl GET /api/searches]:::run
+  RT[app/api/searches/route.ts]:::server
+  DB[lib/db.ts<br/>prisma]:::db
+  SQL --> NEON
+  DEV --> RT
+  CURL --> RT
+  RT --> DB
+  DB --> NEON
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
 ```
