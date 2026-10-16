@@ -1075,10 +1075,10 @@ flowchart TD
       <li>Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>4361b7f</code> feat: lib/counties.ts 13 week 4 counties; prompt log entry 13</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
-      <li>Purpose: one county list for the dropdown (#4) and for Zod (B2.8)</li>
+      <li>Purpose: one county list for the county dropdown in <code>LicensePicker.tsx</code> (#6 Search a license count) and for Zod (B2.8)</li>
       <li>Input: none (fixed data)</li>
       <li>Output: <code>COUNTIES</code> and <code>CountyValue</code> (<code>"HARRIS" | "DALLAS" | …</code>)</li>
       <li>Flow: <code>lib/counties.ts</code> → dropdown shows <code>label</code> → browser sends <code>value</code> → Zod checks it is one of the 13 → <code>lib/tdlr.ts</code> / Prisma</li>
@@ -1102,7 +1102,7 @@ flowchart TD
           <li><code>lib/counties.ts</code>: <code>COUNTIES</code> and <code>CountyValue</code></li>
         </ul>
       </li>
-      <li>Its role in the project: read by <code>lib/validation.ts</code> (B2.8) and the county dropdown (#4)</li>
+      <li>Its role in the project: read by <code>lib/validation.ts</code> (B2.8) and the county dropdown in <code>LicensePicker.tsx</code> (#6 Search a license count)</li>
     </ul>
   </td></tr>
 </table>
@@ -1113,7 +1113,7 @@ flowchart TD
 flowchart TD
   W4[Week 4 src/data/counties.js]:::run
   CO[lib/counties.ts<br/>COUNTIES + CountyValue]:::ui
-  PK[county dropdown<br/>#4, not built yet]:::ui
+  PK[LicensePicker.tsx county dropdown<br/>#6 Search a license count, not built yet]:::ui
   VA[lib/validation.ts<br/>B2.8]:::server
   RT[app/api/**/route.ts<br/>#3, not built yet]:::server
   W4 --> CO
