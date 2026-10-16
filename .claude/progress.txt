@@ -1,4 +1,4 @@
 stage: B
-step: B2.4 (4 of 8)
+step: B2.5 (5 of 8)
 issue: #2
-title: Write schema.prisma and prisma.config.ts
+title: Run init migration on Neon dev

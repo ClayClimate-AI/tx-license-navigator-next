@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SavedSearch {
+  id          Int      @id @default(autoincrement())
+  licenseType String
+  county      String // ALL CAPS, as TDLR expects, e.g. FORT BEND
+  label       String
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([licenseType, county]) // C4: one saved search per type + county
+}

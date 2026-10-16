@@ -535,7 +535,7 @@ flowchart TD
       <li>15:00 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>955338d</code> docs+chore: prisma 7 research, neon dev setup, monday checkpoints, prisma 7.10.0 packages; prompt log entries 7-9</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: confirm the Prisma 7 + Neon setup against primary sources before any code, and fix the spec where it had gaps</li>
@@ -629,7 +629,7 @@ flowchart TD
       <li>16:51 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>955338d</code> docs+chore: prisma 7 research, neon dev setup, monday checkpoints, prisma 7.10.0 packages; prompt log entries 7-9</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the app and Prisma know where the database is</li>
@@ -721,7 +721,7 @@ flowchart TD
       <li>18:26 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>955338d</code> docs+chore: prisma 7 research, neon dev setup, monday checkpoints, prisma 7.10.0 packages; prompt log entries 7-9</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the project has Prisma, the Neon adapter, Zod and dotenv at pinned versions, and the build prints the Prisma client before building the app</li>
@@ -789,4 +789,86 @@ flowchart TD
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef deps fill:#a16207,color:#fff,stroke:#fde68a
+```
+
+---
+
+## Entry 10 · #2 Prisma schema and config
+
+*Oct 15 · ~18:40 to 19:34 CT (includes breaks)*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.4 only: write <code>prisma/schema.prisma</code> and <code>prisma.config.ts</code> from <code>design.md</code>, then <code>npx prisma validate</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> (Database)</li>
+      <li><code>docs/research/prisma-7-neon.md</code> (§4.1 config, §4.2 schema, §5 build)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 new files
+    <ul>
+      <li>⬛ <code>prisma/schema.prisma</code> (new) · <code>prisma-client</code> generator to <code>../generated/prisma</code>, <code>postgresql</code> datasource with no <code>url</code>, <code>SavedSearch</code> with <code>@@unique([licenseType, county])</code></li>
+      <li>⬛ <code>prisma.config.ts</code> (new) · <code>import "dotenv/config"</code>, schema and migrations paths, <code>url: process.env.DIRECT_URL ?? ""</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx prisma validate</code>: "The schema at prisma/schema.prisma is valid"</li>
+      <li><code>DIRECT_URL= npx prisma generate</code>: "Generated Prisma Client (7.10.0) to ./generated/prisma" (no <code>DIRECT_URL</code>, as on Netlify)</li>
+      <li>19:34 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: Prisma has a blueprint and settings, so it can print the client and build the table</li>
+      <li>Input: <code>schema.prisma</code>, <code>prisma.config.ts</code>, <code>DIRECT_URL</code> from <code>.env</code> via dotenv</li>
+      <li>Output: <code>prisma validate</code> passes; client printed to <code>generated/prisma/</code> (git-ignored)</li>
+      <li>Flow: <code>prisma</code> CLI → <code>prisma.config.ts</code> → dotenv loads <code>.env</code> → <code>schema.prisma</code> → validate ✓ → generate → <code>generated/prisma/client.ts</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>npx prisma validate</code> is the inspector: it catches blueprint mistakes before they reach the real database.</li>
+      <li><code>prisma.config.ts</code> is a configuration file that imports dotenv, which loads <code>.env</code> so the config can pass the direct URL to the CLI. It also points at the schema, and Prisma knows what a valid schema looks like.</li>
+      <li>We simulated the Netlify build by leaving <code>DIRECT_URL</code> blank, because Netlify won't have it, and ran <code>prisma generate</code>. <code>?? ""</code> means "use empty if it's missing", and the generate worked without crashing.</li>
+      <li>Once the schema exists, the client can be created. Later, <code>lib/db.ts</code> locks it to the server and plugs it into the adapter, which uses the pooled URL.</li>
+      <li>In one sentence: the config tells Prisma where things are, the schema says what the table looks like and forbids duplicates, <code>validate</code> confirmed both are correct, and a blank-URL <code>generate</code> proved the Netlify build will work.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 10 · #2 Prisma schema and config</b>
+    <ul>
+      <li>What it is: the blueprint (<code>schema.prisma</code>) and the address book for the builder (<code>prisma.config.ts</code>)</li>
+      <li>Why: <code>generate</code> and <code>migrate</code> both read the blueprint; the config tells them where it is and which database line to use</li>
+      <li>Files:
+        <ul>
+          <li><code>prisma/schema.prisma</code>: <code>SavedSearch</code>, 7 columns, one saved search per license type + county</li>
+          <li><code>prisma.config.ts</code>: loads <code>.env</code>, gives the CLI <code>DIRECT_URL</code>, blank-safe for Netlify</li>
+        </ul>
+      </li>
+      <li>Its role in the project: B2.5 turns the blueprint into a real table on Neon <code>dev</code>; B2.6 imports the printed client in <code>lib/db.ts</code></li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 10 call graph
+
+```mermaid
+flowchart TD
+  CLI[prisma CLI<br/>validate + generate]:::tool
+  CF[prisma.config.ts<br/>paths + DIRECT_URL or blank]:::db
+  ENV[.env via dotenv<br/>DIRECT_URL]:::db
+  SC[prisma/schema.prisma<br/>SavedSearch + unique rule]:::db
+  GEN[generated/prisma/client.ts<br/>printed client]:::db
+  CLI --> CF
+  CF --> ENV
+  CF --> SC
+  SC --> GEN
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
 ```
