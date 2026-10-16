@@ -822,7 +822,7 @@ flowchart TD
       <li>19:34 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>958ed39</code> feat: prisma schema (SavedSearch) and prisma.config.ts; prompt log entry 10</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: Prisma has a blueprint and settings, so it can print the client and build the table</li>
@@ -869,6 +869,94 @@ flowchart TD
   CF --> ENV
   CF --> SC
   SC --> GEN
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+---
+
+## Entry 11 · #2 Init migration on Neon dev
+
+*Oct 15 · ~19:36 to 19:53 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.5 only: <code>npx prisma migrate dev --name init</code> against Neon <code>dev</code>, then check the table</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>prisma/schema.prisma</code>, <code>prisma.config.ts</code>, <code>.env</code> (<code>DIRECT_URL</code>)</li>
+      <li>Joseph's Neon console screenshot (Computes · <code>dev</code> · ACTIVE)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 new files, plus the Neon database
+    <ul>
+      <li>⬛ <code>prisma/migrations/20261016004014_init/migration.sql</code> (new) · <code>CREATE TABLE "SavedSearch"</code> and unique index <code>SavedSearch_licenseType_county_key</code></li>
+      <li>⬛ <code>prisma/migrations/migration_lock.toml</code> (new) · provider <code>postgresql</code></li>
+      <li>⬛ Neon <code>dev</code> · <code>SavedSearch</code> table and Prisma's <code>_prisma_migrations</code> log</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>1st <code>migrate dev</code>: ✗ P1001 can't reach <code>ep-long-rain-b42vrn8u…us-east-2.aws.neon.tech:5432</code></li>
+      <li><code>nc -z</code> to port 5432: connection succeeded (network open; compute was waking)</li>
+      <li>2nd <code>migrate dev</code>: "Applying migration 20261016004014_init" · "Your database is now in sync with your schema"</li>
+      <li><code>npx prisma migrate status</code>: "1 migration found" · "Database schema is up to date!"</li>
+      <li>Neon console: compute <code>ep-long-rain-b42vrn8u</code> on <code>dev</code> ACTIVE</li>
+      <li>Neon console · Tables · branch <code>dev</code>: <code>SavedSearch</code> and <code>_prisma_migrations</code> listed; <code>_prisma_migrations</code> has 1 row, <code>20261016004014_init</code>, 1 applied step</li>
+      <li>19:53 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the table exists in a real database, so the app has somewhere to save searches</li>
+      <li>Input: <code>schema.prisma</code>; <code>DIRECT_URL</code> via <code>prisma.config.ts</code> and dotenv</li>
+      <li>Output: <code>migration.sql</code> and <code>migration_lock.toml</code> in the repo; <code>SavedSearch</code> on Neon <code>dev</code></li>
+      <li>Flow: <code>prisma migrate dev</code> → config → <code>DIRECT_URL</code> → Neon <code>dev</code> → shadow DB check → write SQL → apply → <code>migrate status</code> ✓</li>
+      <li>What differed: the first run hit P1001 while the free-tier compute was asleep; one retry after a network check worked</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>Neon is the company: people sign up and use its service, which runs in the cloud. Postgres is the type of database it runs.</li>
+      <li>What we just did was use the direct line to the database so our schema now matches a real table inside it, named <code>SavedSearch</code>. If we go to Neon and look in the database, it's a SQL database, and the table inside is based on our schema.</li>
+      <li>We need a tool to build all this, and that's where Prisma comes in: tools on my side, run from my laptop. The CLI builds tables, which is what we just did.</li>
+      <li>The client reads and writes rows. It's TypeScript, typed against the schema, and Zod checks the browser's input before it gets there.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 11 · #2 Init migration on Neon dev</b>
+    <ul>
+      <li>What it is: the builder turning the blueprint into a real room, and keeping the receipt (<code>migration.sql</code>)</li>
+      <li>Why: the app needs a real table to save into; the receipt lets <code>production</code> get the identical table later with <code>prisma migrate deploy</code></li>
+      <li>Files:
+        <ul>
+          <li><code>prisma/migrations/…_init/migration.sql</code>: the exact SQL that ran</li>
+          <li><code>prisma/migrations/migration_lock.toml</code>: locks the project to Postgres</li>
+        </ul>
+      </li>
+      <li>Its role in the project: closes AC 4 (init migration exists) and AC 5 (table on <code>dev</code>); routes in #3 read and write this table</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 11 call graph
+
+```mermaid
+flowchart TD
+  CLI[prisma migrate dev<br/>--name init]:::tool
+  CF[prisma.config.ts<br/>DIRECT_URL via dotenv]:::db
+  SC[prisma/schema.prisma<br/>blueprint]:::db
+  SQL[migrations/…_init/migration.sql<br/>the receipt]:::db
+  NEON[Neon dev<br/>SavedSearch table]:::db
+  CLI --> CF
+  CLI --> SC
+  SC --> SQL
+  CF --> NEON
+  SQL --> NEON
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
 ```
