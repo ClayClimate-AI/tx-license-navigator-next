@@ -1,4 +1,4 @@
 stage: C
-step: C1.4 (4 of 5)
+step: C1.5 (5 of 5)
 issue: #3
-title: Navigator + page
+title: Browser checks + close #3

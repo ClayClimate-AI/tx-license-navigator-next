@@ -1578,7 +1578,7 @@ flowchart TD
       <li>Not yet visible on the page; <code>Navigator</code> renders it in C1.4</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>a3a20cb</code> feat: SavedCard and SavedList components; prompt log entry 19</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the parts that draw the saved list and its states</li>
@@ -1623,4 +1623,88 @@ flowchart TD
   SC --> CO
   SL -->|Try again| NAV
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 20 · #3 Navigator and page
+
+*Oct 16 · ~18:20 to 18:50 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C1.4 only: <code>Navigator</code> (client) fetches the saved list, tracks its status, holds the status line, and <code>page.tsx</code> renders it</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> State ownership and page order; issue #3 ACs (status line <code>role="status"</code>, Network 200)</li>
+      <li><code>components/SavedList.tsx</code>, <code>components/SavedCard.tsx</code> (C1.3)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 1 modified
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (new) · <code>"use client"</code>; <code>fetchSearches()</code>; state <code>searches</code>, <code>listStatus</code>, <code>reloadKey</code>, <code>message</code>; <code>useEffect</code> on <code>reloadKey</code>; <code>retry()</code>; <code>&lt;p role="status"&gt;</code> + <code>&lt;SavedList/&gt;</code></li>
+      <li>🟦 <code>app/page.tsx</code> (modified) · imports and renders <code>&lt;Navigator /&gt;</code> after the trust note</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li><code>curl /</code>: HTML contains <code>role="status"</code>, "My saved searches", "Loading saved searches…"</li>
+      <li>Joseph's browser: 2 cards, Travis then Harris, Harris with its note. First screenshot had unstyled cards (CSS not yet rebuilt for the new files); served CSS then contained <code>bg-white</code>, <code>border-[#C7D0DB]</code>, <code>space-y-3</code>; after a hard refresh the cards were white with the light border</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the saved list appears on the page, loaded from Neon, with a working Try again</li>
+      <li>Input: none from outside; fetches <code>GET /api/searches</code> on mount</li>
+      <li>Output: status line (empty for now) and <code>SavedList</code> in its current state</li>
+      <li>Flow: page loads → <code>Navigator</code> mounts → <code>useEffect</code> → <code>fetch /api/searches</code> → <code>route.ts</code> → Prisma → Neon → JSON → <code>setSearches</code> → <code>SavedList</code> → <code>SavedCard</code> × 2</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>All this time I understood that the browser wouldn't make requests. This solidifies the client component that facilitates those requests: what's received, and how that information is allocated and used once it's received.</li>
+      <li>The browser is what sends requests over the network, and the <code>Navigator</code> is the code inside the browser that tells it to send <code>/api/searches</code>.</li>
+      <li>The <code>Navigator</code> fetches the saved list when the page opens and hands it to <code>SavedList</code>, which shows the cards, the empty text, or an error with Try again.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 20 · #3 Navigator and page</b>
+    <ul>
+      <li>What it is: the page's brain, the one component that fetches and remembers</li>
+      <li>Why: state and <code>useEffect</code> only run in the browser, so this part is a client component while the page stays a server component</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: fetch, state, status line</li>
+          <li><code>app/page.tsx</code>: renders it under the trust note</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the save, edit, and delete flows (#4, #5, #8) refetch through <code>reloadKey</code> and announce through the status line</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 20 call graph
+
+```mermaid
+flowchart TD
+  PG[app/page.tsx<br/>server component]:::entry
+  NAV[components/Navigator.tsx<br/>use client · fetch + state]:::ui
+  RT[app/api/searches/route.ts<br/>GET]:::server
+  DB[lib/db.ts<br/>prisma]:::db
+  NEON[Neon dev]:::db
+  SL[components/SavedList.tsx]:::ui
+  SC[components/SavedCard.tsx]:::ui
+  PG --> NAV
+  NAV -->|fetch| RT
+  RT --> DB
+  DB --> NEON
+  NAV --> SL
+  SL --> SC
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```

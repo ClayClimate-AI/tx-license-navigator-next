@@ -1,3 +1,4 @@
+import Navigator from "@/components/Navigator";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import TrustNote from "@/components/TrustNote";
@@ -15,6 +16,7 @@ export default function Home() {
           before you train or apply.
         </p>
         <TrustNote />
+        <Navigator />
       </main>
       <SiteFooter />
     </>
