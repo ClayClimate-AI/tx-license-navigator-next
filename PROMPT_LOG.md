@@ -1124,3 +1124,92 @@ flowchart TD
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
+
+## Entry 14 · #2 Repo audit and cleanup
+
+*Oct 16 · ~09:25 to 10:00 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>A full read-only audit of the repo before B2.8, then: rename the reference images to <code>week5_issue2_{step}_{topic}.png</code>, fix Entry 13's issue references, and hold notes for B2.8</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Every project file outside <code>node_modules</code>, <code>.next</code> and <code>generated</code></li>
+      <li><code>docs/spec/design.md</code>, <code>.claude/tickets.md</code>, <code>gh issue list</code>, the GitHub file tree of <code>main</code> (via <code>gh api</code>)</li>
+      <li><code>node_modules/next/dist/docs/01-app/01-getting-started/15-route-handlers.md</code> (Cache Components)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    10 renamed images, 1 modified file
+    <ul>
+      <li><code>docs/assets/reference/</code> · all 10 images renamed to <code>week5_issue2_{step}_{topic}.png</code>; 6 committed ones by Joseph with <code>git mv</code>, 4 uncommitted ones by the agent with <code>mv</code></li>
+      <li><code>PROMPT_LOG.md</code> (modified) · Entry 13: county dropdown is in <code>LicensePicker.tsx</code> (#6 Search a license count), not #4; Commit row <code>4361b7f</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted; each change shown and approved before it was made</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li>Secret scan for connection strings: only the <code>FAKEPASSWORD</code> placeholders in <code>docs/research/prisma-7-neon.md</code></li>
+      <li><code>gh api</code> tree of <code>main</code>: no <code>.env</code>, no <code>generated/</code>, no <code>.claude/settings.local.json</code></li>
+      <li><code>npm audit --omit=dev</code>: 4 high, all <code>deepmerge-ts</code> and <code>mysql2</code> inside the Prisma CLI; fixed in Prisma 7.10.1</li>
+      <li><code>md5 -r</code>: all 10 images distinct, no duplicates</li>
+      <li><code>ls docs/assets/reference</code>: all 10 <code>week5_issue2_*.png</code> names, no old names left</li>
+      <li>Next.js docs: a database query stops a <code>GET</code> route from being prerendered under Cache Components, so <code>GET /api/searches</code> runs per request</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: check the project is still on track before the last step of #2</li>
+      <li>Input: the repo, GitHub, the specs and the installed Next.js docs</li>
+      <li>Output: 11 findings, ranked; image renames; Entry 13 fix; notes for B2.8</li>
+      <li>Flow: inventory → configs → code vs <code>design.md</code> → secrets → <code>tsc</code>, lint, audit → GitHub tree → findings → approved changes</li>
+      <li>Carried forward: <code>idParam</code> <code>.max(2147483647)</code>, strict <code>createBody</code> and <code>updateBody</code> (both <code>label</code> and <code>note</code> required), <code>COUNTY_VALUES</code> built from <code>COUNTIES</code>, and <code>lib/validation.ts</code> in the legend → B2.8 · Prisma 7.10.1 and Node pin → #11 · README, <code>public/*.svg</code>, the Neon hostname in Entry 11, the <code>npm install</code> permission → open</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This was a good time to look at the project and check that we were still on track.</li>
+      <li>Along the way we found things worth noting and made changes to match.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 14 · #2 Repo audit and cleanup</b>
+    <ul>
+      <li>What it is: a check of the whole repo against the spec and the rules, with nothing changed until each fix was approved</li>
+      <li>Why: catching a 500-instead-of-404 bug and a wrong issue number now is cheaper than after the routes exist</li>
+      <li>Files:
+        <ul>
+          <li><code>docs/assets/reference/week5_issue2_*.png</code>: names now say which step and topic each image shows</li>
+        </ul>
+      </li>
+      <li>Its role in the project: sets up B2.8 with clear rules and leaves #11 a short list</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 14 call graph
+
+```mermaid
+flowchart TD
+  AU[Read-only audit]:::tool
+  CO[Configs and code vs design.md]:::db
+  GH[GitHub tree and issues]:::run
+  FI[11 findings]:::tool
+  IM[docs/assets/reference<br/>10 images renamed]:::run
+  PL[PROMPT_LOG.md<br/>Entry 13 fix]:::tool
+  B28[B2.8 notes<br/>lib/validation.ts]:::server
+  AU --> CO
+  AU --> GH
+  CO --> FI
+  GH --> FI
+  FI --> IM
+  FI --> PL
+  FI --> B28
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
