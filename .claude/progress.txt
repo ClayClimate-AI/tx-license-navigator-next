@@ -1,4 +1,4 @@
 stage: C
-step: C1.3 (3 of 5)
+step: C1.4 (4 of 5)
 issue: #3
-title: SavedCard + SavedList
+title: Navigator + page

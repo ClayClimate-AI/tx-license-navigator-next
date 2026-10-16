@@ -1502,7 +1502,7 @@ flowchart TD
       <li>A stray draft row in <code>_prisma_migrations</code> (Tables view, Add record) was discarded before saving</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>0d74b88</code> docs: rows in neon survive restart; prompt log entry 18</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: prove the route returns real rows, newest first, and that they survive a server restart [R1, R5]</li>
@@ -1548,4 +1548,79 @@ flowchart TD
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+```
+
+## Entry 19 · #3 SavedCard and SavedList
+
+*Oct 16 · ~17:55 to 18:15 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C1.3 only: <code>SavedCard</code> (view only) and <code>SavedList</code> (heading, loading, empty, error with Try again, list)</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> UI wording, saved card look, focus ids (A2); R1, R2, R3, E3</li>
+      <li><code>SOT_documents/UI.md</code> Part 1 colors (border <code>#C7D0DB</code>, error <code>#FDF2F4</code> / <code>#A3243B</code>); <code>lib/counties.ts</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 new files
+    <ul>
+      <li>🟩 <code>components/SavedCard.tsx</code> (new) · <code>SavedSearch</code> type; <code>countyLabel()</code>; h3 label with <code>id="saved-{id}-heading"</code> and <code>tabIndex={-1}</code>; "{type} · {county label} County"; note only if present</li>
+      <li>🟩 <code>components/SavedList.tsx</code> (new) · <code>ListStatus</code>; h2 "My saved searches" (<code>id="saved-heading"</code>, <code>tabIndex={-1}</code>); loading text; error box with Try again → <code>onRetry</code>; empty text; <code>&lt;ul&gt;</code> of cards keyed by id</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li>Not yet visible on the page; <code>Navigator</code> renders it in C1.4</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the parts that draw the saved list and its states</li>
+      <li>Input: <code>SavedList</code> gets <code>searches</code>, <code>status</code>, <code>onRetry</code>; <code>SavedCard</code> gets one <code>search</code></li>
+      <li>Output: h2 heading, then loading text, error box, empty text, or a list of cards</li>
+      <li>Flow: <code>Navigator</code> (C1.4) → <code>SavedList</code> picks a state → <code>SavedCard</code> per row → <code>countyLabel</code></li>
+      <li>New wording not in <code>design.md</code>: "Loading saved searches…"</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>SavedList</code> decides which state to show, and <code>SavedCard</code> draws one saved search.</li>
+      <li>There are no fetches in this part. They only display what the <code>Navigator</code> hands them.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 19 · #3 SavedCard and SavedList</b>
+    <ul>
+      <li>What it is: two display-only components for the watchlist</li>
+      <li>Why: keeping fetching in <code>Navigator</code> and drawing here means each piece has one job</li>
+      <li>Files:
+        <ul>
+          <li><code>components/SavedList.tsx</code>: the section and its four states</li>
+          <li><code>components/SavedCard.tsx</code>: one saved search; Edit, Delete (#4, #5) and the count (#9) join later</li>
+        </ul>
+      </li>
+      <li>Its role in the project: what the visitor sees under "My saved searches"</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 19 call graph
+
+```mermaid
+flowchart TD
+  NAV[components/Navigator.tsx<br/>C1.4, not built yet]:::ui
+  SL[components/SavedList.tsx<br/>loading · error · empty · list]:::ui
+  SC[components/SavedCard.tsx<br/>one saved search]:::ui
+  CO[lib/counties.ts<br/>county labels]:::ui
+  NAV --> SL
+  SL --> SC
+  SC --> CO
+  SL -->|Try again| NAV
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```
