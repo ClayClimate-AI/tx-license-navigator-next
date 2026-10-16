@@ -990,7 +990,7 @@ flowchart TD
       <li>08:57 CT · Joseph restated the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>1f465c6</code> feat: lib/db.ts shared prisma client with neon adapter; prompt log entry 12</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: every route in #3 imports one ready client instead of building its own</li>
@@ -1045,4 +1045,82 @@ flowchart TD
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+## Entry 13 · #2 lib/counties.ts 13 counties
+
+*Oct 16 · ~09:05 to 09:20 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.7 only: port the 13 Week 4 counties to <code>lib/counties.ts</code> as <code>{ label, value }</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Week 4 repo <code>ClayClimate-AI/tx-license-navigator</code> · <code>src/data/counties.js</code> (via <code>gh api</code>)</li>
+      <li><code>docs/spec/design.md</code> lines 25 and 82 (<code>county</code>: one of the <code>lib/counties.ts</code> values)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file
+    <ul>
+      <li>🟩 <code>lib/counties.ts</code> (new) · <code>COUNTIES</code>, 13 <code>{ label, value }</code> in Week 4 order, <code>as const</code>; type <code>CountyValue</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh api</code> returned the Week 4 list: 13 counties, Harris to Loving, with the Oct 7 dataset note</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: one county list for the dropdown (#4) and for Zod (B2.8)</li>
+      <li>Input: none (fixed data)</li>
+      <li>Output: <code>COUNTIES</code> and <code>CountyValue</code> (<code>"HARRIS" | "DALLAS" | …</code>)</li>
+      <li>Flow: <code>lib/counties.ts</code> → dropdown shows <code>label</code> → browser sends <code>value</code> → Zod checks it is one of the 13 → <code>lib/tdlr.ts</code> / Prisma</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>counties.ts</code> is a shared list that tells the screen what to show and the server what to accept.</li>
+      <li>The screen and the server read the same list, so they can't drift apart, and that's why there are no typos between them.</li>
+      <li>The accepting part maps to the Zod rules. It's a single check: is this value exactly one of the thirteen on the list?</li>
+      <li>Zod doesn't know what a real county is. A real county that isn't on the list, or the right county in the wrong case, gets a 400.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 13 · #2 lib/counties.ts 13 counties</b>
+    <ul>
+      <li>What it is: the list of 13 counties, each with a display name and the exact ALL CAPS value TDLR stores</li>
+      <li>Why: "Fort Bend" for people, <code>FORT BEND</code> for TDLR; <code>as const</code> keeps the exact words so Zod can allow only these</li>
+      <li>Files:
+        <ul>
+          <li><code>lib/counties.ts</code>: <code>COUNTIES</code> and <code>CountyValue</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: read by <code>lib/validation.ts</code> (B2.8) and the county dropdown (#4)</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 13 call graph
+
+```mermaid
+flowchart TD
+  W4[Week 4 src/data/counties.js]:::run
+  CO[lib/counties.ts<br/>COUNTIES + CountyValue]:::ui
+  PK[county dropdown<br/>#4, not built yet]:::ui
+  VA[lib/validation.ts<br/>B2.8]:::server
+  RT[app/api/**/route.ts<br/>#3, not built yet]:::server
+  W4 --> CO
+  CO --> PK
+  CO --> VA
+  VA --> RT
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```

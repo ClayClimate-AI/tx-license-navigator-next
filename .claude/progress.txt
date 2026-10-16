@@ -1,4 +1,4 @@
 stage: B
-step: B2.7 (7 of 8)
+step: B2.8 (8 of 8)
 issue: #2
-title: lib/counties.ts 13 counties
+title: lib/validation.ts Zod schemas + npm run build
