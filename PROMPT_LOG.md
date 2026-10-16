@@ -1247,7 +1247,7 @@ flowchart TD
       <li>Issue #2: all 6 ACs ticked; <code>Actual: 31.9 h (wall clock, includes breaks)</code> added via <code>gh issue edit</code></li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>1a9df68</code> feat: lib/validation.ts zod schemas, build passes; prompt log entry 15 (Closes #2)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: every route from #3 on checks input first, so bad input stops at 400 before the database</li>
@@ -1303,5 +1303,88 @@ flowchart TD
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+## Entry 16 · #2 README and Node version
+
+*Oct 16 · ~14:20 to 14:45 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Address the review's gaps before #3: rewrite the starter <code>README.md</code>, write down the Node version, and keep the README updated as part of the loop</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>An outside review: the README was the biggest gap; the Node version was not written down</li>
+      <li>Entry 14 audit findings 2 (Node pin) and 7 (README boilerplate)</li>
+      <li><code>docs/spec/design.md</code>, <code>.claude/tickets.md</code>, <code>package.json</code>, <code>SiteFooter.tsx</code> (data source wording)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 4 modified
+    <ul>
+      <li><code>.nvmrc</code> (new) · <code>22</code></li>
+      <li>🟨 <code>package.json</code> (modified) · <code>"engines": { "node": "&gt;=22" }</code></li>
+      <li><code>docs/spec/design.md</code> (modified) · Node pin now lives in <code>.nvmrc</code> and <code>engines</code>, not #11</li>
+      <li><code>README.md</code> (modified) · rewritten: what it does, counts-only privacy, Status table #1–#11, stack, mermaid call graph, run locally, scripts, layout, how it's built, data source</li>
+      <li><code>CLAUDE.md</code> (modified) · The loop: keep <code>README.md</code> current; Status table updated at each issue close</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted; plan shown and approved before each change</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npm pkg get engines</code>: <code>{ "node": "&gt;=22" }</code></li>
+      <li>README has no Vercel, Geist, or connection string text</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the front page tells the truth about the app, and Netlify builds on a known Node version</li>
+      <li>Input: the review, the audit findings, the spec</li>
+      <li>Output: a project README with a Status table and call graph; Node 22 pinned</li>
+      <li>Flow: plan → approve → Node pin → diff → approve → README rewrite and loop rule → accept</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>We updated the README.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 16 · #2 README and Node version</b>
+    <ul>
+      <li>What it is: the project's front door, rewritten, plus the Node version written into the repo</li>
+      <li>Why: the README is the first page a grader or demo viewer sees; the Neon adapter needs Node 22's built-in WebSocket</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: what, privacy, status, stack, flow, setup</li>
+          <li><code>.nvmrc</code> and <code>package.json</code> <code>engines</code>: Node 22 or later</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the Status table is updated at every issue close from now on</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 16 call graph
+
+```mermaid
+flowchart TD
+  RV[Outside review and Entry 14 audit]:::run
+  NV[.nvmrc 22]:::tool
+  PK[package.json<br/>engines node >=22]:::deps
+  RM[README.md<br/>status, stack, call graph, setup]:::run
+  CL[CLAUDE.md<br/>README rule in The loop]:::tool
+  NET[Netlify build<br/>#11]:::run
+  RV --> NV
+  RV --> PK
+  RV --> RM
+  RV --> CL
+  NV --> NET
+  CL --> RM
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef deps fill:#a16207,color:#fff,stroke:#fde68a
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```

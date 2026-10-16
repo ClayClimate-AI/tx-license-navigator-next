@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center"><img src="docs/assets/banner.png" alt="TX License Navigator banner" width="100%"></p>
 
-## Getting Started
+# Second Chance License Navigator
 
-First, run the development server:
+See how many people hold a Texas occupational license in a county, using live data from the Texas Department of Licensing and Regulation (TDLR), and keep a watchlist of saved searches so job seekers can track local demand before they train.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Week 5 rebuild of the Week 4 app in Next.js, adding a saved-searches watchlist stored in Neon Postgres.
+
+## What it does
+
+- **Search:** pick a license type and one of 13 Texas counties, get the live number of license holders there.
+- **Watchlist:** save a search with a label and an optional note, see your saved searches with fresh counts, edit the label and note, or delete one.
+
+## Privacy: counts only
+
+The app asks TDLR for counts and nothing else. It never fetches or shows names, addresses, or license numbers. The watchlist stores only the license type, county, label, and note.
+
+## Status
+
+| Stage | Issue | | Status |
+|---|---|---|---|
+| B · Foundation | #1 | Project shell with the Week 4 look | ✅ |
+| | #2 | Database ready | ✅ |
+| C · Read, delete, edit | #3 | See my saved searches | ⬜ |
+| | #4 | Delete a saved search | ⬜ |
+| | #5 | Edit a saved search's label and note | ⬜ |
+| D · Search and save | #6 | Search a license count | ⬜ |
+| | #7 | Live license types from TDLR | ⬜ |
+| | #8 | Save a search to the watchlist | ⬜ |
+| E · Counts and done check | #9 | Live counts on saved cards | ⬜ |
+| | #10 | Done check | ⬜ |
+| F · Deploy | #11 | Deploy to Netlify | ⬜ |
+
+## Stack
+
+| Part | Choice |
+|---|---|
+| Framework | Next.js 16.4.1 (App Router, Route Handlers), React 19.3, TypeScript |
+| Styling | Tailwind CSS 4 |
+| Database | Neon Postgres (`dev` branch for building, `production` for the live site) |
+| ORM | Prisma 7.10.0, pinned exactly (npm's `latest` tag is an 8.0 release candidate), with `@prisma/adapter-neon` |
+| Validation | Zod 4 on every request body, query, and id |
+| Hosting | Netlify |
+| Runtime | Node 22 or later (`.nvmrc`) |
+
+## How a request flows
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>page and components]:::run
+  RT[app/api/**/route.ts]:::server
+  VA[lib/validation.ts<br/>Zod check]:::server
+  BAD[400 error]:::server
+  DB[lib/db.ts<br/>one shared Prisma client]:::db
+  NEON[Neon Postgres<br/>via pooled DATABASE_URL]:::db
+  TD[lib/tdlr.ts<br/>server only, counts only]:::tdlr
+  API[TDLR on data.texas.gov]:::run
+  BR -->|fetch| RT
+  RT --> VA
+  VA -->|invalid| BAD
+  VA -->|valid| DB
+  DB -->|SQL| NEON
+  VA -->|valid| TD
+  TD --> API
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Saved searches go through Prisma to Neon. Counts go through `lib/tdlr.ts` to TDLR. Both paths pass the same Zod check first.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run it locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install Node 22 or later (`nvm use` reads `.nvmrc`).
+2. `npm install`
+3. Copy `.env.example` to `.env` and fill in both values from the Neon console (`dev` branch):
+   - `DATABASE_URL`: the pooled connection string, used by the app
+   - `DIRECT_URL`: the direct connection string, used by Prisma migrations
 
-## Learn More
+   `.env` is git-ignored. Never commit it.
+4. `npx prisma migrate dev` creates the `SavedSearch` table on your Neon branch.
+5. `npm run dev` and open http://localhost:3000.
 
-To learn more about Next.js, take a look at the following resources:
+| Script | What it does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | `prisma generate`, then `next build` (the same build Netlify runs) |
+| `npm run lint` | ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/          🟦 layout and page · 🟥 api/**/route.ts
+components/   🟩 header, trust note, footer, and the search and watchlist UI
+lib/          🟩 counties.ts · 🟥 validation.ts · ⬛ db.ts · 🟫 tdlr.ts
+prisma/       ⬛ schema.prisma and migrations
+docs/spec/    requirements, design, tasks
+```
 
-## Deploy on Vercel
+## How it's built
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Work comes from GitHub issues, done in small steps through one loop: ask → review diff → accept → test → commit. Every accepted step is recorded in [`PROMPT_LOG.md`](PROMPT_LOG.md). What the app must do is in [`docs/spec/requirements.md`](docs/spec/requirements.md), and how it's built is in [`docs/spec/design.md`](docs/spec/design.md).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Data source
+
+TDLR All Licenses on [data.texas.gov](https://data.texas.gov/d/7358-krk7) (dataset 7358-krk7).
+
+A student project, not an official State of Texas website. General information, not legal advice.

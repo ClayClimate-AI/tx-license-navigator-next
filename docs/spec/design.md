@@ -71,7 +71,7 @@ model SavedSearch {
 - `lib/db.ts` creates one `PrismaClient` with `PrismaNeon` and `DATABASE_URL` (pooled), and reuses it across dev hot reloads via `globalThis`. It imports `server-only`.
 - The build script runs `prisma generate` before `next build`, so Netlify has a client.
 - Migrations: `prisma migrate dev` against Neon `dev` while building. Before the deploy, `prisma migrate deploy` is run once from the laptop with `DIRECT_URL` pointed at Neon `production`.
-- Node 22 or later, locally and on Netlify (pinned in #11). `PrismaNeon` uses Neon's WebSocket pool, and Node 22+ has a built-in WebSocket, so no `ws` package.
+- Node 22 or later, locally and on Netlify (pinned in `.nvmrc` and `package.json` `engines`). `PrismaNeon` uses Neon's WebSocket pool, and Node 22+ has a built-in WebSocket, so no `ws` package.
 - The exact Prisma 7 config syntax, with sources, is in `docs/research/prisma-7-neon.md`.
 
 ## Validation (`lib/validation.ts`, Zod 4)

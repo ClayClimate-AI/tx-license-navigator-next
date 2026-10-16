@@ -10,6 +10,7 @@ ask → review diff → accept → test → commit → next.
 - Work the issue in **small steps**: one behavior, usually 1–2 files, a diff of about 60 lines or less. Read the issue's acceptance criteria first and propose the steps.
 - After each step, show the diff and the report below, then stop and wait. The next step starts only when Joseph asks for it.
 - When the issue's acceptance criteria all pass: add `Actual:` to the issue, then remind Joseph to end his last commit message with `Closes #N`. Joseph runs `/clear` before the next issue.
+- Keep `README.md` current: a step that changes setup, scripts, versions, env vars, or routes includes the README edit in its diff, and each issue close updates the README's Status table.
 - Joseph runs every git command himself. Leave committing and pushing to him.
 - When a task turns out bigger than a small step, say so and propose how to split it before writing code.
 
