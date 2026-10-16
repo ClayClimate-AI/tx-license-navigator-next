@@ -1338,7 +1338,7 @@ flowchart TD
       <li>README has no Vercel, Geist, or connection string text</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>039af6f</code> docs: rewrite README, pin node 22; prompt log entry 16</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the front page tells the truth about the app, and Netlify builds on a known Node version</li>
@@ -1386,5 +1386,89 @@ flowchart TD
   CL --> RM
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef deps fill:#a16207,color:#fff,stroke:#fde68a
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+## Entry 17 · #3 GET /api/searches
+
+*Oct 16 · ~16:48 to 17:27 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Work issue #3. Step C1.1 only: <code>GET /api/searches</code> returns the saved list, newest first, or a 500 with the E3 message</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #3 ACs; <code>docs/spec/requirements.md</code> R1, R5, E3; <code>docs/spec/design.md</code> API contracts and UI wording</li>
+      <li><code>node_modules/next/dist/docs/…/15-route-handlers.md</code> and <code>…/connection.md</code></li>
+      <li><code>lib/db.ts</code> (shared Prisma client)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, plus <code>.env</code> outside git
+    <ul>
+      <li>🟥 <code>app/api/searches/route.ts</code> (new) · <code>GET</code>: <code>await connection()</code>, <code>findMany</code> by <code>createdAt</code> desc → <code>200 { searches }</code>; on error → <code>500 { error }</code></li>
+      <li><code>.env</code> (git-ignored) · Joseph reset the <code>neondb_owner</code> password on <code>dev</code> and pasted fresh <code>dev</code> pooled and direct URLs</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh issue comment 3</code>: <code>Started</code> posted 2026-10-16T21:48:29Z</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>First <code>curl /api/searches</code>: <code>500</code> "We could not reach the saved searches database." Dev log: P1000 <code>AuthenticationFailed</code></li>
+      <li>URL shape check: <code>DATABASE_URL</code> pointed at a different Neon endpoint than <code>DIRECT_URL</code> (<code>dev</code>)</li>
+      <li>After the fix: both URLs on the <code>dev</code> endpoint, <code>DATABASE_URL</code> pooled; <code>curl</code> → <code>{"searches":[]}</code> status <code>200</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the browser can ask the server for the saved list</li>
+      <li>Input: a <code>GET</code> with no body or params; <code>DATABASE_URL</code> via <code>lib/db.ts</code></li>
+      <li>Output: <code>200 { searches }</code> newest first, or <code>500 { error }</code></li>
+      <li>Flow: <code>fetch</code> → <code>route.ts</code> → <code>connection()</code> → <code>prisma.savedSearch.findMany</code> → Neon pooler → Postgres → JSON</li>
+      <li>What differed: the first call failed because <code>.env</code>'s <code>DATABASE_URL</code> pointed at the wrong Neon endpoint. While diagnosing, the agent's test script crashed and printed the pooled URL with its password to the terminal; Joseph reset the password and replaced both URLs</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>route.ts</code> is the counter where the browser asks for the saved list, and it answers with the rows or a plain error.</li>
+      <li>C1.1 is our first real round trip in terms of a GET request: the browser asks for the saved list, the server asks the database, and the answer comes back as JSON.</li>
+      <li>So far it only reads. The methods that write, like POST and PATCH, come later.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 17 · #3 GET /api/searches</b>
+    <ul>
+      <li>What it is: the first Route Handler, answering at <code>/api/searches</code></li>
+      <li>Why: the saved list (C1.3, C1.4) needs a server door to the database; the browser never talks to Neon directly</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/searches/route.ts</code>: <code>GET</code> now; <code>POST</code> joins in #8</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the list the watchlist shows, and the refetch after every save, edit, and delete [R5]</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 17 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>fetch GET /api/searches]:::run
+  RT[app/api/searches/route.ts<br/>GET]:::server
+  DB[lib/db.ts<br/>prisma]:::db
+  NEON[Neon dev<br/>SavedSearch]:::db
+  OK[200 searches]:::server
+  ERR[500 error]:::server
+  BR --> RT
+  RT --> DB
+  DB --> NEON
+  RT --> OK
+  RT --> ERR
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
