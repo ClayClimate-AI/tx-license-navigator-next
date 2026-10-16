@@ -75,11 +75,11 @@
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>So my understanding and reflection of this is That the main purpose was to get Next.js app up and running because this is one step that's sequential and every other step builds on.</li>
-      <li>there were no inputs on this particular ticket, the goal was just to establish the project shell with the same look from week four.</li>
-      <li>The output was essentially the Next.js starter page, which was tested at localhost 3000.</li>
-      <li>The actions that were taken were pretty much running <code>npm run dev</code>. and making sure that the Next.js starter page was showing with the message to edit the file, which was a statement that was indicating whether or not it was working.</li>
-      <li>Everything rendered and And We didn't edit the <code>page.tsx</code> starter page, but moving on for step two, we will commence with the git ignore additions, the dot env and example and then we'll initiate and connect to the repo and establish our first commit.</li>
+      <li>My understanding is that the main purpose was to get the Next.js app up and running, because this step comes first and every other step builds on it.</li>
+      <li>There were no inputs on this ticket; the goal was just to establish the project shell with the same look as Week 4.</li>
+      <li>The output was the Next.js starter page, which I tested at <code>localhost:3000</code>.</li>
+      <li>The main action was running <code>npm run dev</code> and making sure the starter page showed the "edit the file" message, which told me it was working.</li>
+      <li>Everything rendered. We didn't edit the <code>page.tsx</code> starter page yet. In step two we'll add the <code>.gitignore</code> rules and <code>.env.example</code>, then connect the folder to the repo and make our first commit.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -153,11 +153,11 @@ flowchart TD
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>In step two, we pretty much took the steps to make the project shape to share.</li>
-      <li>the dot gitignore file already blocked the node modules, which I was able to catch Build output in every.env file.</li>
-      <li>There was an exception that was added so that the.env. example gets committed as a template plus rules for Prisma were generated for the client and Netlify's local folder because anything that can be rebuilt or that holds a secret doesn't belong in get.</li>
-      <li>From there, we connected the folder to the get repo to GitHub. Or the folder became a get repo connected to GitHub.</li>
-      <li>We ran this shell command get status that showed the ignore rules working before anything was staged and initiated the first commit and push to put the project online.</li>
+      <li>In step two, we took the steps to make the project safe to share.</li>
+      <li>The <code>.gitignore</code> file already blocked <code>node_modules</code>, build output, and every <code>.env</code> file, which I was able to catch.</li>
+      <li>We added an exception so <code>.env.example</code> gets committed as a template, plus rules for the generated Prisma client and Netlify's local folder, because anything that can be rebuilt or that holds a secret doesn't belong in git.</li>
+      <li>From there, the folder became a git repo connected to GitHub.</li>
+      <li>We ran <code>git status</code>, which showed the ignore rules working before anything was staged, then made the first commit and push to put the project online.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -231,11 +231,11 @@ flowchart TD
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>So in conducting step three, we got some similar features from the week four look that would be applied to the whole site.</li>
-      <li>The changes in global CSS give every page kind of a light gray background and a dark text, and this kind of yellow ring that appears. I guess only when you're moving around with keyboard functionality,</li>
-      <li><code>Layout.tsx</code> sets the browser tab title, which is similar to the week four and drops the default Next.js font and dark mode because those weren't used in the previous build.</li>
-      <li>Also, by pressing tab, there's a yellow ring that's kind of highlighted around your tab selections.</li>
-      <li>The rest of the formatting is still being worked on</li>
+      <li>In step three, we brought over Week 4 look features that apply to the whole site.</li>
+      <li>The changes in <code>globals.css</code> give every page a light gray background, dark text, and a yellow ring that appears only when you move around with the keyboard.</li>
+      <li><code>layout.tsx</code> sets the browser tab title to match Week 4, and drops the default Next.js font and dark mode because the previous build didn't use them.</li>
+      <li>When you press Tab, a yellow ring highlights whatever is selected.</li>
+      <li>The rest of the formatting is still being worked on.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -310,9 +310,9 @@ flowchart TD
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>So for step four we added the header and the footer bands to the page.</li>
-      <li>These are similar to the theme and the setup in week four.</li>
-      <li>We reloaded the local host 3000 to check them and then accepted step four and provided a reflection upon it.</li>
+      <li>In step four, we added the header and footer bands to the page.</li>
+      <li>They match the theme and setup from Week 4.</li>
+      <li>We reloaded <code>localhost:3000</code> to check them, then I accepted step four and gave my reflection.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -377,7 +377,7 @@ flowchart TD
       <li>06:01 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>1834dd2</code> docs: prompt log header and entries 5-6 · Closes #1 (steps 5 and 6 together)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the top of the page reads exactly like Week 4, including the counts only promise</li>
@@ -388,10 +388,10 @@ flowchart TD
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>we added a new component which was the trust note. it's very simple but very important something that we adopted in week four.</li>
-      <li>There's a green box that promises counts only, never names, addresses or license records</li>
-      <li><code>page.tsx</code> now has the week foreheading Look up license by demand by county and the intro line above it with the same color and sizes with the header, footer, and trust note in place.</li>
-      <li>The page can be check side by side against week 4, and that was the planned to originally pick up where we left off.</li>
+      <li>We added a new component, the trust note. It's very simple but very important, and something we adopted from Week 4.</li>
+      <li>It's a green box that promises counts only: never names, addresses, or license records.</li>
+      <li><code>page.tsx</code> now has the Week 4 heading, "Look up HVAC license demand by county," and the intro line, with the same colors and sizes, and the header, footer, and trust note in place.</li>
+      <li>The page can be checked side by side against Week 4, which was the original plan for picking up where we left off.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -454,7 +454,7 @@ flowchart TD
       <li>06:08 CT · Joseph accepted the step</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>Commit</b></td><td><code>1834dd2</code> docs: prompt log header and entries 5-6 · Closes #1</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the log opens like Week 4, so a grader sees the layers and the project at a glance</li>
@@ -465,10 +465,10 @@ flowchart TD
   </td></tr>
   <tr><td><b>Reflection</b></td><td>
     <ul>
-      <li>So in step six it was pretty simple. we just added the banner from week four. so now that the prompt log has that banner it matches the week four layout.</li>
-      <li>it has the title with tool and model the legend is the eight color code layers that we're using to kind of break down Down all the different parts, components, and functionality in the call graph, and also notes that are associated with With each part that we're working on within that particular area of the prompt log.</li>
-      <li>the banner image is copied from the week four repo. we have an assets folder that it was placed in and this pretty much closes the issue number one.</li>
-      <li>We're going to check this in GitHub and then proceed to updating the log and checking GitHub for next steps Regarding the issues</li>
+      <li>Step six was pretty simple: we added the banner from Week 4, so the prompt log now matches the Week 4 layout.</li>
+      <li>It has the title with the tool and model. The legend is the eight color-coded layers we use to break down the different parts, components, and functionality in the call graphs, along with the notes for each part we work on in the prompt log.</li>
+      <li>The banner image is copied from the Week 4 repo into an assets folder, and this step closes issue #1.</li>
+      <li>We're going to check this on GitHub, then update the log and check GitHub for the next issues.</li>
     </ul>
   </td></tr>
   <tr><td><b>Explained</b></td><td>
@@ -496,4 +496,297 @@ flowchart TD
   L --> K[Legend<br/>8 layers from CLAUDE.md]:::run
   L --> E[Entries 1 to 6<br/>one per step]:::run
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+---
+
+## Entry 7 · #2 Research Prisma 7 + Neon setup
+
+*Oct 15 · ~06:20 to 15:00 CT (includes breaks)*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · skill <code>research</code> (background agent)</td></tr>
+  <tr><td><b>Asked</b></td><td>Work issue #2: post <code>Started</code>, split into 8 steps; then step B2.1 only: <code>/research</code> Prisma 7.10 <code>prisma-client</code> generator, <code>prisma.config.ts</code> with <code>DIRECT_URL</code> and dotenv, <code>PrismaNeon</code> with pooled <code>DATABASE_URL</code> in Next.js 16. Then: restructure the notes so they are digestible (plain words, examples, diagrams) without losing context; rename the reference images in <code>docs/assets</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>issue #2 (acceptance criteria) and <code>docs/agents/issue-tracker.md</code></li>
+      <li><code>docs/spec/design.md</code> (Database, Validation) and <code>docs/spec/tasks.md</code></li>
+      <li><code>CLAUDE.md</code> (Stack)</li>
+      <li>Prisma v7 docs, Prisma 7.0.0 and 7.10.0 release notes and source, Neon docs, Next.js docs, <code>npm view</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 1 edited, 3 images moved
+    <ul>
+      <li><code>docs/research/prisma-7-neon.md</code> (new) · findings with sources, glossary, examples, call graphs</li>
+      <li><code>docs/spec/design.md</code> (modified) · Database: <code>dotenv</code>, <code>process.env.DIRECT_URL ?? ""</code>, Node 22+, link to the research</li>
+      <li><code>docs/assets/reference/</code> (new folder) · <code>prisma-neon-request-flow.png</code>, <code>zod-decision-architecture.png</code>, <code>issue-2-step-plan.png</code> (renamed from <code>image.png</code>, <code>image copy.png</code>, the screenshot)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted · gap 1 option (a) <code>process.env.DIRECT_URL ?? ""</code>, gap 2 Node 22+, gap 3 add <code>dotenv</code></td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>06:20 CT · <code>Started</code> comment posted on #2 (blocker #1 closed)</li>
+      <li><code>npm view</code>: <code>prisma</code>, <code>@prisma/client</code>, <code>@prisma/adapter-neon</code> all exist at 7.10.0</li>
+      <li><code>node --version</code>: v26.7.0 (Node 22+, no <code>ws</code> needed locally)</li>
+      <li>research found no outright conflict with <code>design.md</code>; 3 gaps recorded and decided</li>
+      <li><code>ls -R docs/assets</code>: <code>banner.png</code> kept (used by this log), 3 images in <code>reference/</code></li>
+      <li>15:00 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: confirm the Prisma 7 + Neon setup against primary sources before any code, and fix the spec where it had gaps</li>
+      <li>Input: Prisma v7, Neon, Next.js and npm sources; Joseph's choices for the 3 gaps</li>
+      <li>Output: <code>docs/research/prisma-7-neon.md</code> with sources; 3 decisions in <code>design.md</code></li>
+      <li>Flow: <code>/research</code> → background agent reads the sources → notes file → restructured for learning → gaps → Joseph decides → <code>design.md</code> updated</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>In this step we researched Prisma 7 and the Neon setup. In plain words, Prisma shows up in three spots: setup (creating the tables), which I'll do on my laptop; the build, which runs on Netlify; and requests, when people click around the site.</li>
+      <li>The setup command is <code>prisma migrate dev</code>. It reads the schema and the Prisma config file, and uses the direct URL.</li>
+      <li>The build runs on Netlify with <code>npm run build</code>. It runs <code>prisma generate</code>, then <code>next build</code>. It reads the schema and the config file, but needs no URL to connect.</li>
+      <li>Then the request: who runs that? Every API call. It goes from <code>route.ts</code> to <code>lib/db.ts</code>, which uses the generated Prisma client and the pooled database URL to connect.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 7 · #2 Research Prisma 7 + Neon setup</b>
+    <ul>
+      <li>What it is: reading the instructions before building. Prisma 7 changed a lot (no <code>url</code> in the schema, no built-in engine, no automatic <code>.env</code>), so memory or old tutorials would be wrong</li>
+      <li>Why: the Netlify build would have failed. <code>prisma generate</code> opens <code>prisma.config.ts</code>, and <code>env("DIRECT_URL")</code> throws when Netlify has no <code>DIRECT_URL</code>; <code>process.env.DIRECT_URL ?? ""</code> does not</li>
+      <li>Files:
+        <ul>
+          <li><code>docs/research/prisma-7-neon.md</code>: the notes, in order setup → build → request</li>
+          <li><code>docs/spec/design.md</code>: the 3 decisions</li>
+        </ul>
+      </li>
+      <li>Its role in the project: steps B2.2 to B2.8 follow these notes, so each config line has a source</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 7 call graph
+
+```mermaid
+flowchart TD
+  S[prisma/schema.prisma<br/>blueprint]:::db
+  C[prisma.config.ts + .env<br/>DIRECT_URL]:::db
+  M[prisma migrate dev<br/>builds the table]:::tool
+  G[prisma generate<br/>writes the client]:::tool
+  N[Neon dev<br/>SavedSearch table]:::db
+  R[app/api/**/route.ts<br/>every API call]:::server
+  D[lib/db.ts<br/>one client, PrismaNeon, DATABASE_URL pooled]:::db
+  S --> M
+  C --> M
+  M --> N
+  S --> G
+  G --> D
+  R --> D
+  D --> N
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+---
+
+## Entry 8 · #2 Neon dev branch and .env
+
+*Oct 15 · ~15:00 to 16:51 CT (includes breaks)*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · skill <code>wizard</code></td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.2 only: <code>/wizard</code> Neon dev branch, get pooled <code>DATABASE_URL</code> and direct <code>DIRECT_URL</code> into <code>.env</code>. Then: rename Neon <code>main</code> to <code>production</code> in <code>design.md</code>, <code>CLAUDE.md</code> and the research notes; clean up reflections in Entries 1–7</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>.env.example</code>, <code>.gitignore</code> (no <code>.github/</code>, so no CI secrets)</li>
+      <li>wizard skill <code>template.sh</code></li>
+      <li>Neon console screenshots from Joseph (org setup, Create new branch, branch list)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file (git-ignored), 4 edited
+    <ul>
+      <li>⬛ <code>.env</code> (new, git-ignored) · <code>DATABASE_URL</code> (pooled), <code>DIRECT_URL</code> (direct)</li>
+      <li><code>docs/spec/design.md</code> (modified) · Neon <code>main</code> → <code>production</code></li>
+      <li><code>CLAUDE.md</code> (modified) · Neon <code>main</code> → <code>production</code></li>
+      <li><code>docs/research/prisma-7-neon.md</code> (modified) · 3 mentions of Neon <code>main</code> → <code>production</code></li>
+      <li><code>PROMPT_LOG.md</code> (modified) · Reflections in Entries 1–7 cleaned up for grammar and dictation errors (Joseph's permission), plus this entry</li>
+      <li>Neon (outside the repo): project <code>tx-license-navigator</code> on AWS US East (Ohio), branches <code>production</code> and <code>dev</code> (auto-delete: never)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted · region Ohio · <code>dev</code> branch never auto-deletes · default branch name <code>production</code></td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>bash -n</code> on the wizard script: no syntax errors</li>
+      <li>wizard checked each paste: pooled string has <code>-pooler</code>, direct string does not</li>
+      <li><code>awk</code> check on <code>.env</code> (values never printed): <code>DATABASE_URL set pooler</code> · <code>DIRECT_URL set direct</code></li>
+      <li>Joseph's Neon branch list shows <code>production</code> and <code>dev</code></li>
+      <li>16:51 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the app and Prisma know where the database is</li>
+      <li>Input: the <code>dev</code> branch's pooled and direct connection strings from the Neon console, pasted hidden into the wizard</li>
+      <li>Output: <code>.env</code> with <code>DATABASE_URL</code> and <code>DIRECT_URL</code>; Neon project with <code>production</code> and <code>dev</code></li>
+      <li>Flow: Neon console → new project → new branch <code>dev</code> → Connect (pooling on) → wizard → <code>.env</code>; pooling off → wizard → <code>.env</code></li>
+      <li>What differed: Neon names its default branch <code>production</code>, not <code>main</code> as the spec said; the spec now says <code>production</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>We created a Neon account and organization; this was my first login. We created the project <code>tx-license-navigator</code>, the database this app will use once Netlify runs it.</li>
+      <li>We created a <code>dev</code> branch from <code>production</code>. <code>dev</code> is the branch we'll build on, and <code>production</code> will serve the live site. So <code>production</code> is like <code>main</code>, and <code>dev</code> is like working on a separate branch in GitHub.</li>
+      <li>We got the two URLs: the direct URL for Prisma migrations, and the pooled database URL for the app.</li>
+      <li>We made sure both URLs were placed correctly in <code>.env</code>, and the wizard verified they weren't swapped.</li>
+      <li>Right now the direct and pooled URLs are in the right places, and <code>.env</code> is covered by <code>.gitignore</code>, so acceptance criterion 2 will close after this.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 8 · #2 Neon dev branch and .env</b>
+    <ul>
+      <li>What it is: getting the database's two phone numbers into a private address book. <code>DATABASE_URL</code> is the switchboard (pooled) the app calls; <code>DIRECT_URL</code> is the private line Prisma uses to build tables</li>
+      <li>Why: nothing can reach Neon without them, and swapping them breaks migrations, so the wizard checked for <code>-pooler</code></li>
+      <li>Files:
+        <ul>
+          <li><code>.env</code>: the two secrets, never committed</li>
+          <li><code>.env.example</code>: the same names with no values, for anyone setting up the project</li>
+        </ul>
+      </li>
+      <li>Its role in the project: B2.5 (migration) uses <code>DIRECT_URL</code>; B2.6 (<code>lib/db.ts</code>) uses <code>DATABASE_URL</code></li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 8 call graph
+
+```mermaid
+flowchart TD
+  NC[Neon console<br/>project tx-license-navigator]:::run
+  P[production branch<br/>live site later]:::db
+  DV[dev branch<br/>build here]:::db
+  W[wizard script<br/>hidden paste, -pooler check]:::run
+  E[.env<br/>DATABASE_URL pooled + DIRECT_URL direct]:::db
+  X[.env.example<br/>names only]:::db
+  NC --> P
+  P --> DV
+  DV --> W
+  W --> E
+  E -.-> X
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
+
+---
+
+## Entry 9 · #2 Prisma packages and build script
+
+*Oct 15 · ~16:55 to 18:26 CT (includes breaks)*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step B2.3 only: install <code>prisma</code>, <code>@prisma/client</code>, <code>@prisma/adapter-neon</code> at exactly 7.10.0, plus <code>zod</code>, <code>dotenv</code>, <code>server-only</code>; build script <code>prisma generate &amp;&amp; next build</code>. Then: fix the skipped Prisma install scripts, review the 9 <code>npm audit</code> findings before going on, and a step-through visual of the step</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/research/prisma-7-neon.md</code> (packages table)</li>
+      <li><code>package.json</code></li>
+      <li>Prisma's install scripts: <code>prisma/scripts/preinstall-entry.js</code>, <code>@prisma/engines/scripts/postinstall.js</code></li>
+      <li><code>npm audit</code> report and <code>npm view</code> release dates for 7.10.x</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    0 new files, 3 edited
+    <ul>
+      <li>🟨 <code>package.json</code> (modified) · <code>@prisma/client</code> 7.10.0, <code>@prisma/adapter-neon</code> 7.10.0, <code>zod</code> 4.6.7, <code>server-only</code> 0.0.1; dev: <code>prisma</code> 7.10.0, <code>dotenv</code> 18.0.8 (all exact); <code>build</code> runs <code>prisma generate</code> first; <code>allowScripts</code> for <code>prisma@7.10.0</code> and <code>@prisma/engines@7.10.0</code></li>
+      <li>🟨 <code>package-lock.json</code> (modified)</li>
+      <li><code>docs/research/prisma-7-neon.md</code> (modified) · note to recheck Prisma 7.10.1 before deploy (#11)</li>
+      <li>Outside the repo: step-through page <a href="https://claude.ai/artifact/7p8jDC39uEZnF6oheMA594">B2.3 Package Flow</a> (private)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted · approve only the two Prisma install scripts (leave ESLint's <code>unrs-resolver</code>) · audit option A: stay on 7.10.0, recheck 7.10.1 before #11, never <code>npm audit fix --force</code></td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx prisma --version</code>: <code>prisma</code> 7.10.0, <code>@prisma/client</code> 7.10.0, Node v26.7.0</li>
+      <li><code>ls</code>: <code>schema-engine-darwin-arm64</code> on disk (25 MB)</li>
+      <li><code>npm install-scripts approve</code> then <code>npm rebuild</code>: "rebuilt dependencies successfully"; <code>npm install-scripts ls</code> lists only <code>unrs-resolver</code></li>
+      <li><code>npm audit</code>: 9 high, all dev-only (5 in the <code>eslint-config-next</code> chain, 4 in the <code>prisma</code> CLI); fix 7.10.1 published 2026-10-15 19:25 UTC</li>
+      <li><code>npm run build</code> not run: <code>prisma generate</code> needs <code>schema.prisma</code> (B2.4)</li>
+      <li>18:26 CT · Joseph accepted the step</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>none yet</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the project has Prisma, the Neon adapter, Zod and dotenv at pinned versions, and the build prints the Prisma client before building the app</li>
+      <li>Input: npm registry packages at exact versions</li>
+      <li>Output: updated <code>package.json</code> and lockfile, packages and the migration engine in <code>node_modules</code></li>
+      <li>Flow: <code>npm install</code> → <code>npm install -D</code> → npm skips Prisma's scripts → read them → approve → <code>npm rebuild</code> → <code>prisma --version</code> OK → <code>npm audit</code> → stay on 7.10.0</li>
+      <li>What differed: npm blocked Prisma's install scripts by default, and the audit flagged 9 dev-only findings; both were handled before moving on</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The <code>.env</code> file holds our secrets: two URLs, one pooled and one direct. <code>dotenv</code> loads them so <code>prisma.config.ts</code> can pass the direct URL to the Prisma CLI.</li>
+      <li>The CLI uses the migration engine, which runs the SQL. Its setup scripts were blocked, so we approved them, and now that whole process is set up properly.</li>
+      <li>From there the migration goes to Neon <code>dev</code>, using the direct URL and the <code>dev</code> branch.</li>
+      <li>Then <code>npm run build</code> on Netlify: <code>prisma generate</code> reads the schema and prints the Prisma client, the code our routes will use, mapped against the schema.</li>
+      <li>Next.js can't build until that "remote control" exists. Then it builds the app, and <code>server-only</code> checks that nothing leaks.</li>
+      <li>On every click, the browser fetches <code>/api/searches</code> and goes through the route. Zod checks what the browser sent: if it passes, it continues; if not, 400.</li>
+      <li><code>server-only</code> is our key: it keeps <code>lib/db.ts</code>, and the database password, away from the browser.</li>
+      <li>The Prisma client takes our TypeScript call, checks it against the schema and turns it into a query. The adapter carries it to Neon over the pooled <code>DATABASE_URL</code>, through the Neon pooler into Postgres.</li>
+      <li>In one sentence: <code>dotenv</code> and Prisma set up the database on the laptop, the build script prints the client before Netlify builds the app, and on every click Zod checks the input, <code>server-only</code> guards the door, and the client plus the adapter carry the query to Neon.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 9 · #2 Prisma packages and build script</b>
+    <ul>
+      <li>What it is: stocking the toolbox. Two tools for the laptop and build (<code>prisma</code>, <code>dotenv</code>), four packages that ship with the app (<code>@prisma/client</code>, <code>@prisma/adapter-neon</code>, <code>zod</code>, <code>server-only</code>)</li>
+      <li>Why: exact versions mean nothing changes under us before the demo; the build order means Netlify prints the client before Next.js needs it</li>
+      <li>Files:
+        <ul>
+          <li><code>package.json</code>: the shopping list, the build order, and which install scripts may run</li>
+          <li><code>package-lock.json</code>: the exact versions npm actually installed</li>
+        </ul>
+      </li>
+      <li>Its role in the project: B2.4 writes the schema <code>generate</code> reads; B2.5 runs <code>migrate</code>; B2.6 builds <code>lib/db.ts</code> on the client and adapter; B2.8 writes the Zod rules</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 9 call graph
+
+```mermaid
+flowchart TD
+  PJ[package.json<br/>pins + build order + allowScripts]:::deps
+  DE[dotenv<br/>loads .env]:::deps
+  CLI[prisma CLI<br/>generate + migrate]:::tool
+  EN[migration engine<br/>setup script approved]:::tool
+  NB[next build<br/>runs after generate]:::tool
+  CL[@prisma/client<br/>base of the client]:::db
+  AD[@prisma/adapter-neon<br/>phone line to Neon]:::db
+  Z[zod<br/>checks input]:::server
+  SO[server-only<br/>keeps db.ts off the browser]:::deps
+  N[Neon<br/>pooler + Postgres]:::db
+  PJ --> DE
+  PJ --> CLI
+  PJ --> NB
+  DE --> CLI
+  CLI --> EN
+  EN --> N
+  CLI --> CL
+  NB --> SO
+  Z --> CL
+  CL --> AD
+  AD --> N
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef deps fill:#a16207,color:#fff,stroke:#fde68a
 ```

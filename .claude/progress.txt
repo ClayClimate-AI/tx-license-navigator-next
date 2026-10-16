@@ -1,4 +1,4 @@
 stage: B
-step: B1 (6 of 6)
-issue: #1
-title: PROMPT_LOG header
+step: B2.4 (4 of 8)
+issue: #2
+title: Write schema.prisma and prisma.config.ts

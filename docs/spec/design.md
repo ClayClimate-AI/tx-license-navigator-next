@@ -67,11 +67,12 @@ model SavedSearch {
 }
 ```
 
-- `prisma.config.ts` loads `.env` (Prisma 7 does not load it on its own), points at the schema and `prisma/migrations`, and gives the CLI `DIRECT_URL`.
+- `prisma.config.ts` loads `.env` with `import "dotenv/config"` (Prisma 7 does not load it on its own; `dotenv` is a devDependency), points at the schema and `prisma/migrations`, and gives the CLI `DIRECT_URL` as `process.env.DIRECT_URL ?? ""`. It does not use `env("DIRECT_URL")`, which throws when the variable is missing and would fail `prisma generate` on Netlify, where `DIRECT_URL` is not set.
 - `lib/db.ts` creates one `PrismaClient` with `PrismaNeon` and `DATABASE_URL` (pooled), and reuses it across dev hot reloads via `globalThis`. It imports `server-only`.
 - The build script runs `prisma generate` before `next build`, so Netlify has a client.
-- Migrations: `prisma migrate dev` against Neon `dev` while building. Before the deploy, `prisma migrate deploy` is run once from the laptop with `DIRECT_URL` pointed at Neon `main`.
-- The exact Prisma 7 config syntax is confirmed against the Prisma docs in the setup task, not taken from memory.
+- Migrations: `prisma migrate dev` against Neon `dev` while building. Before the deploy, `prisma migrate deploy` is run once from the laptop with `DIRECT_URL` pointed at Neon `production`.
+- Node 22 or later, locally and on Netlify (pinned in #11). `PrismaNeon` uses Neon's WebSocket pool, and Node 22+ has a built-in WebSocket, so no `ws` package.
+- The exact Prisma 7 config syntax, with sources, is in `docs/research/prisma-7-neon.md`.
 
 ## Validation (`lib/validation.ts`, Zod 4)
 

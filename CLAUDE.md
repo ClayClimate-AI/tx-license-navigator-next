@@ -34,7 +34,7 @@ End each task with this report, in short lines:
   - Generator `provider = "prisma-client"` with an explicit `output`.
 - Zod validates every request body and `params.id` at the route.
 - In route handlers, `params` is a Promise: `const { id } = await params`.
-- Neon: build on the `dev` branch; `main` serves the live Netlify site. Netlify env vars are pasted by hand from the Neon console.
+- Neon: build on the `dev` branch; `production` (Neon's default branch) serves the live Netlify site. Netlify env vars are pasted by hand from the Neon console.
 
 ## Hard rules
 

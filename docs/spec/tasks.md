@@ -20,9 +20,10 @@ At each checkpoint, compare against the list and apply the named cut if behind.
 
 | When | Should be closed | If not |
 |---|---|---|
-| Wed end of day | #1–#5: read, delete, edit work on localhost | Apply cut 2 (skip #7) |
-| Thu 15:00 CT | #6–#8: search and save work | Apply cut 1 (skip #9) |
-| Thu 20:00 CT | #10 closed, #11 started | If #11 is blocked at 22:00, apply cut 4 |
+| Fri end of day | #2–#5: read, delete, edit work on localhost | Apply cut 2 (skip #7) |
+| Sat end of day | #6–#8: search and save work | Apply cut 1 (skip #9) |
+| Sun 18:00 CT | #9 and #10 closed, #11 started | If #11 is blocked at 22:00, apply cut 4 |
+| Mon morning | demo prep (see Monday below) | — |
 
 ## Cut order (fallback)
 
@@ -48,6 +49,6 @@ Use skill `diagnosing-bugs` instead of guessing fixes. The fix is its own small 
 - [ ] Keyboard only: search, save, edit, delete; focus lands where `design.md` says; status line announces each.
 - [ ] No names, addresses, or license numbers anywhere; `.env` not in git.
 
-## Friday (not an issue)
+## Monday (not an issue)
 
-Demo prep before 10:00: add two saved searches on the live site; the agent asks Joseph for the Friday submit fields ("Change I will explain", "Mistake I caught") and adds his answers verbatim to `PROMPT_LOG.md`; sum each issue's Estimate and Actual into a table in `PROMPT_LOG.md`; decide how to share the private repo for submission; one rehearsal.
+The demo moved from Friday Oct 16 to Monday Oct 19 (approved). Demo prep before the demo: add two saved searches on the live site; the agent asks Joseph for the Friday submit fields ("Change I will explain", "Mistake I caught") and adds his answers verbatim to `PROMPT_LOG.md`; sum each issue's Estimate and Actual into a table in `PROMPT_LOG.md`; decide how to share the private repo for submission; one rehearsal.

@@ -4,7 +4,7 @@ GitHub issues on ClayClimate-AI/tx-license-navigator-next. Check a box when its 
 
 ## Stage B · Foundation
 
-- [ ] B1 · #1 Project shell with the Week 4 look
+- [x] B1 · #1 Project shell with the Week 4 look
 - [ ] B2 · #2 Database ready
 
 ## Stage C · Read, delete, edit
