@@ -1,8 +1,43 @@
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
-import { idParam } from "@/lib/validation";
+import { idParam, updateBody } from "@/lib/validation";
 
 type Context = { params: Promise<{ id: string }> };
+
+// PATCH /api/searches/[id]: change label and note only. 200 { search } on success. [U1, U2]
+export async function PATCH(request: Request, { params }: Context) {
+  const { id } = await params;
+  const parsedId = idParam.safeParse(id);
+  if (!parsedId.success) {
+    return Response.json({ error: "That is not a valid saved search id." }, { status: 400 });
+  }
+
+  // A body that is not JSON at all is also a 400, not a 500.
+  const json = await request.json().catch(() => null);
+  const parsedBody = updateBody.safeParse(json);
+  if (!parsedBody.success) {
+    // Missing label, label over 80, note over 280, or an extra key such as county. [E1, U2]
+    return Response.json({ error: "Check the label and note, then try again." }, { status: 400 });
+  }
+
+  try {
+    const search = await prisma.savedSearch.update({
+      where: { id: parsedId.data },
+      data: parsedBody.data,
+    });
+    return Response.json({ search });
+  } catch (err) {
+    // P2025: no row with that id. [E2]
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+      return Response.json({ error: "That saved search no longer exists." }, { status: 404 });
+    }
+    console.error(`PATCH /api/searches/${id} failed:`, err);
+    return Response.json(
+      { error: "We could not reach the saved searches database." },
+      { status: 500 },
+    );
+  }
+}
 
 // DELETE /api/searches/[id]: remove one saved search. 204 with no body on success. [D2]
 export async function DELETE(_request: Request, { params }: Context) {

@@ -2169,3 +2169,95 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
+
+## Entry 26 · #5 PATCH /api/searches/[id]
+
+*Oct 17 · ~14:22 to 14:35 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Work issue #5. Step C3a only: <code>PATCH /api/searches/[id]</code> checks the id and the body with Zod and updates label and note; 200, 400, 404, 500</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #5 ACs; <code>docs/spec/design.md</code> Validation (<code>updateBody</code>), API contracts (PATCH), error messages; <code>docs/agents/issue-tracker.md</code></li>
+      <li><code>app/api/searches/[id]/route.ts</code> (the DELETE pattern), <code>lib/validation.ts</code>, <code>README.md</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟥 <code>app/api/searches/[id]/route.ts</code> (modified) · <code>PATCH</code>: <code>await params</code> → <code>idParam.safeParse</code> (400) → <code>request.json().catch(() =&gt; null)</code> → <code>updateBody.safeParse</code> (400) → <code>prisma.savedSearch.update</code> → <code>200 { search }</code>; <code>P2025</code> → <code>404</code>; other errors → <code>500</code></li>
+      <li>No README edit: its layout already covers <code>api/**/route.ts</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh issue comment 5</code>: <code>Started</code> posted 2026-10-17T19:22:40Z</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>19:29:17 GMT · Joseph: <code>curl -i -X PATCH /api/searches/1</code> <code>{"label":"Edited","note":"hi"}</code>: <code>200</code>, label "Edited", note "hi", <code>updatedAt</code> 2026-10-17T19:29:15Z, type and county unchanged</li>
+      <li>19:30:34 GMT · Joseph: same with <code>"county":"HARRIS"</code> added: <code>400</code> "Check the label and note, then try again."</li>
+      <li>19:32:28 GMT · Joseph: <code>curl -i -X PATCH /api/searches/99999</code>: <code>404</code> "That saved search no longer exists."</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the server can change a saved search's label and note, and nothing else [U1, U2, E2]</li>
+      <li>Input: <code>params.id</code> as text, JSON body <code>{ label, note }</code></li>
+      <li>Output: <code>200 { search }</code> (row updated in Neon), or <code>400</code> / <code>404</code> / <code>500</code> with <code>{ error }</code></li>
+      <li>Flow: <code>curl</code> or browser <code>fetch</code> PATCH → <code>route.ts</code> → <code>await params</code> → Zod <code>idParam</code> → <code>request.json()</code> → Zod <code>updateBody</code> (strict) → Prisma <code>update</code> → Neon → JSON</li>
+      <li>New wording not in <code>design.md</code>: 400 "Check the label and note, then try again." (shared by every body error, including an extra <code>county</code> key)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>PATCH is DELETE plus a body check: the route checks the id, checks the body, runs Prisma <code>update</code>, and turns errors into status codes.</li>
+      <li><code>request.json().catch(() =&gt; null)</code> returns null if the body isn't JSON at all, so Zod sees null and fails, and the answer is a 400 instead of a crash and a 500.</li>
+      <li>All in all, the route trusts nothing from the browser. Zod decides what gets through, and Prisma's error codes decide which status comes back.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 26 · #5 PATCH /api/searches/[id]</b>
+    <ul>
+      <li>What it is: the second method in the <code>[id]</code> route file, the first one that reads a request body</li>
+      <li>Why: the Edit form (C3b to C3d) needs a server door that changes label and note; <code>z.strictObject</code> refuses <code>county</code> or <code>licenseType</code>, so type and county cannot change [U2]</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/searches/[id]/route.ts</code>: <code>PATCH</code> and <code>DELETE</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: the server half of edit; <code>SaveSearchForm</code>, <code>SavedCard</code>, and <code>Navigator</code> call it next</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 26 call graph
+
+```mermaid
+flowchart TD
+  CL[curl / Browser<br/>PATCH /api/searches/1]:::run
+  RT["app/api/searches/[id]/route.ts<br/>PATCH"]:::server
+  ZID[lib/validation.ts<br/>idParam]:::server
+  ZB[lib/validation.ts<br/>updateBody strict]:::server
+  DB[lib/db.ts<br/>prisma.savedSearch.update]:::db
+  NEON[Neon dev<br/>SavedSearch]:::db
+  R200[200 search]:::server
+  R400[400 bad id or body]:::server
+  R404[404 P2025 no longer exists]:::server
+  R500[500 database error]:::server
+  CL --> RT
+  RT --> ZID
+  ZID -->|fail| R400
+  ZID -->|ok| ZB
+  ZB -->|fail| R400
+  ZB -->|ok| DB
+  DB --> NEON
+  DB --> R200
+  DB -->|P2025| R404
+  DB -->|other| R500
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
