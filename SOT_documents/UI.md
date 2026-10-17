@@ -29,6 +29,7 @@ This file is context only. Part 1 is facts about how Week 4 looked, taken from t
 - License type list had two groups: "HVAC" and "All other license types". While loading it said "Loading license types…".
 - County error text in red `#A3243B`: "There is a problem: …"
 - Button: navy `#14304F`, white bold text, hover `#0E2238`. Says "Show license count", or "Checking…" while busy.
+- Outline button (Week 5, saved cards: Delete, Keep): white, navy `#14304F` border and bold text, hover light navy tint `#EEF2F6`. The confirmed Delete uses the red Try again style (`#A3243B`, hover `#82192D`).
 
 ### Status line
 - One short line above the result, also read out by screen readers. Example: "Ready. Choose a license type and a county."

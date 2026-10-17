@@ -1830,7 +1830,7 @@ flowchart TD
       <li>Joseph's Neon Tables view, <code>SavedSearch</code>: only id 1 HARRIS left (1 of 1)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: DELETE /api/searches/[id] removes a saved search; prompt log entry 22</td></tr>
+  <tr><td><b>Commit</b></td><td><code>90f7881</code> feat: DELETE /api/searches/[id] removes a saved search; prompt log entry 22</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can delete one saved search by id and refuse bad or missing ids [D2, E1, E2]</li>
@@ -1886,4 +1886,89 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 23 · #4 Delete and confirm on the card
+
+*Oct 17 · after the <code>90f7881</code> push to ~11:06 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C2.2 only: the card gets Delete; Delete asks "Delete this saved search?" with Delete and Keep; Keep returns the card to normal and focus to Delete; confirmed Delete calls <code>onDelete(id)</code>. Then: "Yes to both. Add #EEF2F6 to UI.md"</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #4 ACs (D1, A2, keyboard alone); <code>docs/spec/design.md</code> State ownership, UI wording, Focus</li>
+      <li><code>SOT_documents/UI.md</code> Part 1 button and error colors</li>
+      <li><code>components/SavedCard.tsx</code>, <code>components/SavedList.tsx</code>, <code>components/Navigator.tsx</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    4 modified
+    <ul>
+      <li>🟩 <code>components/SavedCard.tsx</code> (modified) · <code>mode</code> state (<code>view</code> / <code>confirmingDelete</code>); <code>deleteRef</code>, <code>keepRef</code>, <code>backToDelete</code>; <code>useEffect</code> on <code>mode</code> focuses Keep or Delete; confirm in a <code>role="group"</code> labelled by the question; red Delete calls <code>onDelete(search.id)</code></li>
+      <li>🟩 <code>components/SavedList.tsx</code> (modified) · <code>onDelete</code> prop passed to each card</li>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · placeholder <code>onDelete={() => {}}</code> until C2.3</li>
+      <li><code>SOT_documents/UI.md</code> (modified) · outline button: white, navy border and text, hover <code>#EEF2F6</code>; confirmed Delete uses the red Try again style</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted; focus to Keep when the confirm opens, and hover <code>#EEF2F6</code>, both approved by Joseph</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li>Joseph's browser, keyboard only: "Tests passed" (Delete opens the confirm with focus on Keep; Keep returns to view with focus on Delete; confirmed Delete does nothing yet)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: delete confirm on the saved card; prompt log entry 23</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: each card can ask "Delete this saved search?" and back out with Keep, without leaving the card [D1, A2]</li>
+      <li>Input: <code>SavedCard</code> gets <code>search</code> and <code>onDelete(id)</code>; <code>SavedList</code> gets <code>onDelete</code></li>
+      <li>Output: the card shows Delete, or the question with red Delete and Keep; confirming calls <code>onDelete(id)</code></li>
+      <li>Flow: Delete → <code>setMode("confirmingDelete")</code> → <code>useEffect</code> focuses Keep · Keep → <code>backToDelete = true</code> → <code>setMode("view")</code> → <code>useEffect</code> focuses Delete · red Delete → <code>onDelete(id)</code> → <code>SavedList</code> → <code>Navigator</code> (placeholder)</li>
+      <li>Not in <code>design.md</code>: focus to Keep when the confirm opens; hover <code>#EEF2F6</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The conditional rendering never shows both sets of buttons at once, until the user confirms it's a delete.</li>
+      <li>Focus goes to Keep by default, because the Delete button could be pressed by accident and Keep is the safe option. It's kind of like steering.</li>
+      <li><code>useRef</code> gives you a handle on the real button. That ties back into <code>useEffect</code> placing the focus on purpose when the mode changes.</li>
+      <li><code>backToDelete</code> lets focus know what happened before; otherwise it would jump to Delete on the first page load. The note is informative, but the actual change comes down to a Boolean condition.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 23 · #4 Delete and confirm on the card</b>
+    <ul>
+      <li>What it is: the card's own small state machine, view or confirming, with focus steered for keyboard users</li>
+      <li>Why: deleting can't be undone, so the card asks first; when buttons swap out, focus has to be placed or a keyboard user lands at the top of the page</li>
+      <li>Files:
+        <ul>
+          <li><code>components/SavedCard.tsx</code>: mode, refs, focus effect, confirm</li>
+          <li><code>components/SavedList.tsx</code>: passes <code>onDelete</code> down</li>
+          <li><code>components/Navigator.tsx</code>: placeholder until C2.3</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the browser half of delete; C2.3 connects it to the DELETE route</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 23 call graph
+
+```mermaid
+flowchart TD
+  DEL[Delete button<br/>outline]:::ui
+  SC[components/SavedCard.tsx<br/>mode · refs · useEffect]:::ui
+  KEEP[Keep<br/>focus back to Delete]:::ui
+  RED[red Delete<br/>onDelete id]:::ui
+  SL[components/SavedList.tsx<br/>passes onDelete]:::ui
+  NAV[components/Navigator.tsx<br/>placeholder until C2.3]:::ui
+  DEL --> SC
+  SC -->|confirmingDelete, focus Keep| KEEP
+  SC --> RED
+  KEEP -->|view| SC
+  RED --> SL
+  SL --> NAV
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```

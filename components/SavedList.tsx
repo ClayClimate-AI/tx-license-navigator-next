@@ -6,10 +6,11 @@ type Props = {
   searches: SavedSearch[];
   status: ListStatus;
   onRetry: () => void;
+  onDelete: (id: number) => void;
 };
 
 // "My saved searches": always on the page, newest first, with empty and error states. [R1, R2, E3]
-export default function SavedList({ searches, status, onRetry }: Props) {
+export default function SavedList({ searches, status, onRetry, onDelete }: Props) {
   return (
     <section aria-labelledby="saved-heading" className="mt-8">
       {/* Focus target after a delete (A2), so it takes tabIndex -1. */}
@@ -41,7 +42,7 @@ export default function SavedList({ searches, status, onRetry }: Props) {
       {status === "ready" && searches.length > 0 && (
         <ul className="mt-3 space-y-3">
           {searches.map((s) => (
-            <SavedCard key={s.id} search={s} />
+            <SavedCard key={s.id} search={s} onDelete={onDelete} />
           ))}
         </ul>
       )}

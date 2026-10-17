@@ -47,7 +47,8 @@ export default function Navigator() {
       <p role="status" className="mt-4 min-h-6 text-[15px] font-semibold text-[#14304F]">
         {message}
       </p>
-      <SavedList searches={searches} status={listStatus} onRetry={retry} />
+      {/* C2.3 replaces this placeholder with the real DELETE. */}
+      <SavedList searches={searches} status={listStatus} onRetry={retry} onDelete={() => {}} />
     </>
   );
 }
