@@ -2291,7 +2291,7 @@ flowchart TD
       <li>Not clickable yet: no card renders the form until C3c</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>a57f064</code> feat: SaveSearchForm for editing a saved search's label and note; prompt log entry 27</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: one label and note form that edit uses now and create reuses in #8 [U1, E3, A2]</li>
@@ -2333,4 +2333,96 @@ flowchart TD
   SF -->|onCancel| SC
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 28 · #5 Edit on the card, wired to PATCH
+
+*Oct 17 · ~14:55 to 15:32 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C3c: <code>SavedCard</code> editing mode. Joseph chose to merge the planned C3d wiring in (<code>SavedList</code> passes <code>onEdit</code>, <code>Navigator.handleEdit</code>) so every commit passes the type check; C3d becomes the acceptance checks and close-out</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> UI (edit mode swaps label and note for the form), Focus (after an edit and after Cancel → Edit button), Flows (edit follows the save shape)</li>
+      <li><code>components/SavedCard.tsx</code>, <code>components/SavedList.tsx</code>, <code>components/Navigator.tsx</code>, <code>components/SaveSearchForm.tsx</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    3 files modified
+    <ul>
+      <li>🟩 <code>components/SavedCard.tsx</code> (modified) · <code>Mode</code> adds <code>"editing"</code>; <code>onEdit</code> prop; Edit button beside Delete; editing mode renders <code>SaveSearchForm</code> in place of label and note; <code>backToDelete</code> became <code>backTo: "edit" | "delete" | null</code>, so Keep → Delete and Cancel or Save → Edit; <code>saveEdit</code> returns to view on <code>null</code></li>
+      <li>🟩 <code>components/SavedList.tsx</code> (modified) · passes <code>onEdit</code> to each card</li>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · <code>handleEdit</code>: <code>fetch</code> PATCH → not ok: return the server's <code>{ error }</code> → ok: "Changes saved." → refetch → return <code>null</code></li>
+      <li><code>PROMPT_LOG.md</code> (modified) · Entry 27 commit hash filled in, Entry 28 added</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>npx eslint components/SavedCard.tsx components/SavedList.tsx components/Navigator.tsx</code>: no output</li>
+      <li>Joseph's screenshot after Save: card heading "Electrician", note "Thinking about going into this field", "A/C Technician · Harris County" unchanged, Edit button shaded</li>
+      <li>Joseph: "Changes saved." showed after Save; the new label survived a reload [U1, A1]</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: a visitor changes a card's label and note in the browser, stored in Neon [U1, A1, A2]</li>
+      <li>Input: Edit click, typed label and note, Save or Cancel</li>
+      <li>Output: updated card, "Changes saved." in the status line, focus on Edit; on a refusal, a red message in the form with typed values kept</li>
+      <li>Flow: Edit → <code>SavedCard</code> <code>editing</code> → <code>SaveSearchForm</code> → Save → <code>saveEdit</code> → <code>Navigator.handleEdit</code> → <code>fetch</code> PATCH → <code>route.ts</code> → Zod → Prisma → Neon → 200 → refetch → <code>null</code> → card view → focus Edit</li>
+      <li>What differed: Joseph expected the type line to change with the label ("why does it still say AC tech"). It doesn't, by design: type and county are fixed [U2]; the label is the visitor's own name for the search</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This step wired Edit for the saved search straight into the server, and the code has to pass the type check and lint.</li>
+      <li>The function is handed down the tree as a prop, and the click travels back up to the <code>Navigator</code>, which talks to the server.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 28 · #5 Edit on the card, wired to PATCH</b>
+    <ul>
+      <li>What it is: the browser half of edit; the card swaps into the form, and <code>Navigator</code> sends the PATCH</li>
+      <li>Why: <code>Navigator</code> owns the list and the status line, so it does the fetch, refetch, and message; the card owns only its mode and where focus returns</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: <code>handleEdit</code></li>
+          <li><code>components/SavedList.tsx</code>: passes <code>onEdit</code> through</li>
+          <li><code>components/SavedCard.tsx</code>: Edit button, editing mode, focus return</li>
+        </ul>
+      </li>
+      <li>Its role in the project: completes the U in CRUD; #8 reuses the same form and prop pattern for create</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 28 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Edit, Save, Cancel]:::run
+  NAV[components/Navigator.tsx<br/>handleEdit]:::ui
+  SL[components/SavedList.tsx<br/>passes onEdit]:::ui
+  SC[components/SavedCard.tsx<br/>editing mode, saveEdit]:::ui
+  SF[components/SaveSearchForm.tsx<br/>onSubmit]:::ui
+  RT["app/api/searches/[id]/route.ts<br/>PATCH"]:::server
+  NEON[Neon dev<br/>SavedSearch]:::db
+  NAV -->|onEdit prop| SL
+  SL -->|onEdit prop| SC
+  SC -->|onSubmit prop| SF
+  BR --> SF
+  SF -->|label, note| SC
+  SC -->|id, label, note| NAV
+  NAV -->|fetch PATCH| RT
+  RT --> NEON
+  RT -->|200 or error| NAV
+  NAV -->|null or message| SC
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
