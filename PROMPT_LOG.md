@@ -1654,7 +1654,7 @@ flowchart TD
       <li>Joseph's browser: 2 cards, Travis then Harris, Harris with its note. First screenshot had unstyled cards (CSS not yet rebuilt for the new files); served CSS then contained <code>bg-white</code>, <code>border-[#C7D0DB]</code>, <code>space-y-3</code>; after a hard refresh the cards were white with the light border</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>1481606</code> feat: Navigator loads saved searches on the page; prompt log entry 20</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the saved list appears on the page, loaded from Neon, with a working Try again</li>
@@ -1707,4 +1707,94 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 21 · #3 Browser checks and close
+
+*Oct 16 · ~18:55 to 19:15 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C1.5: walk me through each browser check for issue #3, one at a time; then "You're gonna have to check this one on your side" for the empty state</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #3 acceptance criteria (R1–R3, R5, E3, Network 200, <code>role="status"</code>)</li>
+      <li><code>components/Navigator.tsx</code>, <code>components/SavedList.tsx</code> (C1.3, C1.4)</li>
+      <li><code>docs/agents/issue-tracker.md</code> (Actual rule)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 modified, plus the issue
+    <ul>
+      <li><code>README.md</code> (modified) · Status table: #3 ⬜ → ✅</li>
+      <li>GitHub issue #3 body · all 6 boxes ticked; <code>Actual: 2.25 h (wall clock, includes breaks)</code></li>
+      <li>No app code changed</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>Check 1 · Joseph's browser: Travis card above Harris; label, type, county display name; Harris shows its note, Travis has none</li>
+      <li>Check 2 · Firefox Network (All selected): <code>searches</code> · <code>GET</code> · <code>200</code> · json; Response <code>searches: [ {id: 2, TRAVIS}, {id: 1, HARRIS} ]</code></li>
+      <li>Check 3 · Firefox Inspector: <code>&lt;p … role="status"&gt;&lt;/p&gt;</code> inside <code>&lt;main&gt;</code>, followed by <code>&lt;section aria-labelledby="saved-heading"&gt;</code></li>
+      <li>Check 4 · Firefox Request Blocking on <code>/api/searches</code>: page showed "We could not reach the saved searches database." with Try again; after unblocking and Try again (no reload; blocked rows still in the list) the 2 cards returned with new <code>200</code> rows</li>
+      <li>Check 5 · agent, headless Chrome via <code>playwright-core</code> in the scratchpad, <code>/api/searches</code> answered with <code>{"searches":[]}</code>: section text "Nothing saved yet. Run a search above, then select Save to watchlist.", 0 cards; Neon not touched</li>
+      <li>Check 6 · Joseph: cards still there after reload and after stopping and restarting <code>npm run dev</code></li>
+      <li><code>gh issue edit 3</code> returned the issue URL</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: show #3 works in a real browser against every acceptance criterion, so it can close</li>
+      <li>Input: the running dev server, Neon <code>dev</code> with 2 rows, Firefox DevTools; headless Chrome for check 5</li>
+      <li>Output: 6 of 6 checks passed; issue #3 ticked with Actual; README Status updated</li>
+      <li>Flow: page load → <code>Navigator</code> <code>useEffect</code> → <code>fetch /api/searches</code> → <code>route.ts</code> → Prisma → Neon → JSON → <code>SavedList</code> (cards, empty, or error) → Try again → refetch</li>
+      <li>What differed: Firefox cannot override a <code>fetch</code> response, so the agent ran check 5; Try again produced 3 <code>200</code> rows where 1 was expected (no harm, same data; look again with <code>diagnosing-bugs</code> if it repeats)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>We did six browser checks that showed the saved list loads from Neon newest first, handles the empty state (checked headless) and the failed state, and survives a restart. So #3 is ready to close.</li>
+      <li>For me personally, this sequence of methods was a really good way to test the application outside the IDE, using the browser's tools.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 21 · #3 Browser checks and close</b>
+    <ul>
+      <li>What it is: proving each acceptance criterion by looking, not by trusting the code</li>
+      <li>Why: the empty and error states never show with real data, so they have to be forced (block the URL, fake the reply)</li>
+      <li>Tools:
+        <ul>
+          <li>Network tab: the request, its status, its JSON</li>
+          <li>Inspector: the <code>role="status"</code> element</li>
+          <li>Request Blocking: a failed request without touching the server</li>
+          <li>Headless Chrome: a browser with no window that a script drives, here to fake an empty list</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the same kind of checks make up the manual check list for #10 and #11</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 21 call graph
+
+```mermaid
+flowchart TD
+  FF[Firefox DevTools<br/>Network · Inspector · Blocking]:::run
+  HC[Headless Chrome<br/>fakes empty reply]:::run
+  NAV[components/Navigator.tsx<br/>fetch + listStatus]:::ui
+  RT[app/api/searches/route.ts<br/>GET]:::server
+  NEON[Neon dev]:::db
+  SL[components/SavedList.tsx<br/>cards · empty · error]:::ui
+  FF --> NAV
+  HC --> NAV
+  NAV -->|fetch| RT
+  RT --> NEON
+  NAV --> SL
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
