@@ -1919,7 +1919,7 @@ flowchart TD
       <li>Joseph's browser, keyboard only: "Tests passed" (Delete opens the confirm with focus on Keep; Keep returns to view with focus on Delete; confirmed Delete does nothing yet)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: delete confirm on the saved card; prompt log entry 23</td></tr>
+  <tr><td><b>Commit</b></td><td><code>8ff7697</code> feat: delete confirm on the saved card; prompt log entry 23</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: each card can ask "Delete this saved search?" and back out with Keep, without leaving the card [D1, A2]</li>
@@ -1971,4 +1971,114 @@ flowchart TD
   RED --> SL
   SL --> NAV
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 24 · #4 Navigator wires up the delete
+
+*Oct 17 · after the <code>8ff7697</code> push to ~12:32 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C2.3 only: <code>handleDelete</code> in <code>Navigator</code> sends the DELETE, refetches the list, sets "Deleted.", and focuses the "My saved searches" heading. Then: redraw the recap's call graph to show props passed down, calls going up, hooks, handlers with types, and imports; save that format as a skill</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #4 ACs (D2, A1, A2); <code>docs/spec/design.md</code> State ownership, error messages, Focus</li>
+      <li><code>components/Navigator.tsx</code>, <code>components/SavedList.tsx</code>, <code>components/SavedCard.tsx</code>; <code>app/api/searches/[id]/route.ts</code> (C2.1)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 modified, plus a skill outside the repo
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · <code>DB_ERROR</code>; <code>setMessage</code>; <code>handleDelete(id)</code>: clear message → <code>fetch DELETE</code> → on 204/404 set the message, <code>setSearches(await fetchSearches())</code>, focus <code>#saved-heading</code>; on 500 or no connection the DB message; placeholder replaced with <code>onDelete={handleDelete}</code></li>
+      <li><code>~/.claude/skills/flow-map/SKILL.md</code> (new, outside git) · Joseph's vertical flow map: imports, hooks and ⚡ handlers with types, props DOWN, calls UP, numbered handler steps</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code> and <code>npm run lint</code>: no output</li>
+      <li>Neon SQL Editor (branch <code>dev</code>, <code>neondb</code>), 11:28am: <code>INSERT</code> of a Travis test row, "Statement executed successfully"</li>
+      <li>Joseph's browser, keyboard only: Travis card gone, status line "Deleted.", yellow focus ring on "My saved searches", Harris card left</li>
+      <li>Joseph's Neon Tables view, <code>SavedSearch</code>: only id 1 HARRIS</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: Navigator deletes a saved search and announces it; prompt log entry 24</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the confirmed Delete removes the row, refreshes the list, and says so [D2, A1, A2]</li>
+      <li>Input: <code>id</code> from the card's <code>onDelete(id)</code></li>
+      <li>Output: row gone from Neon; list refetched; <code>role="status"</code> line "Deleted."; focus on the section heading</li>
+      <li>Flow: red Delete → <code>onDelete(id)</code> → <code>SavedList</code> → <code>handleDelete</code> in <code>Navigator</code> → <code>fetch DELETE</code> → <code>route.ts</code> → Zod → Prisma → Neon → 204 → <code>fetch GET /api/searches</code> → <code>setSearches</code> → "Deleted." → focus <code>#saved-heading</code></li>
+      <li>Failed-delete wording (Joseph approved in C2.1): 404 "That saved search no longer exists.", otherwise "We could not reach the saved searches database."</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The first thing I did was understand the flow. If I can match the visual flow, I can go inside the actual component and understand not only the syntax but the flow of it as well. Once there are many moving parts, I map the flow first, then read the code to see how each piece fits.</li>
+      <li>The hard part for me has been the top-down method, not only within one component but in how things are passed. I focus so much on syntax that I sometimes miss the bigger picture of how everything ties together, so I made a flow map reference.</li>
+      <li>On page load the props go down. We pass down four props, named like the values they hold, to the right component so they can be used. Some are used through handler functions, like a click or a delete, and others carry state.</li>
+      <li><code>Navigator</code> is the parent, <code>SavedList</code> is its child, and <code>SavedCard</code> is the child of <code>SavedList</code> and the grandchild of <code>Navigator</code>.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 24 · #4 Navigator wires up the delete</b>
+    <ul>
+      <li>What it is: the handler that connects the card's confirmed Delete to the DELETE route, then refreshes the page's state</li>
+      <li>Why: <code>Navigator</code> owns the list and the status line, so the card only reports the id; refetching keeps Neon the one source of truth [R5]</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: <code>handleDelete</code>, passed down as <code>onDelete</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: delete now works end to end; the edit flow in #5 follows the same shape with PATCH</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 24 call graph
+
+```mermaid
+flowchart TD
+  RED[SavedCard red Delete<br/>onDelete id]:::ui
+  SL[components/SavedList.tsx<br/>passes onDelete]:::ui
+  NAV[components/Navigator.tsx<br/>handleDelete]:::ui
+  RT["app/api/searches/[id]/route.ts<br/>DELETE"]:::server
+  NEON[Neon dev<br/>row deleted]:::db
+  GET[app/api/searches/route.ts<br/>GET fresh list]:::server
+  UI[status Deleted.<br/>focus My saved searches]:::ui
+  RED --> SL
+  SL --> NAV
+  NAV -->|fetch DELETE| RT
+  RT --> NEON
+  RT -->|204| NAV
+  NAV -->|fetch GET| GET
+  GET --> NAV
+  NAV --> UI
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+### Entry 24 async sequence
+
+```mermaid
+sequenceDiagram
+  participant C as SavedCard
+  participant N as Navigator handleDelete
+  participant D as DELETE route
+  participant G as GET route
+  participant P as Prisma + Neon
+  C->>N: onDelete(3)
+  N->>N: setMessage("")
+  N->>D: await fetch DELETE /api/searches/3
+  D->>P: savedSearch.delete
+  P-->>D: ok
+  D-->>N: 204
+  N->>N: setMessage("Deleted.")
+  N->>G: await fetch GET /api/searches
+  G->>P: findMany
+  P-->>G: rows
+  G-->>N: 200 searches
+  N->>N: setSearches, focus heading
 ```
