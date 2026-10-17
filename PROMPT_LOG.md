@@ -2201,7 +2201,7 @@ flowchart TD
       <li>19:32:28 GMT · Joseph: <code>curl -i -X PATCH /api/searches/99999</code>: <code>404</code> "That saved search no longer exists."</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>4601d3d</code> feat: PATCH /api/searches/[id] updates label and note; prompt log entry 26</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can change a saved search's label and note, and nothing else [U1, U2, E2]</li>
@@ -2260,4 +2260,77 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 27 · #5 SaveSearchForm in edit mode
+
+*Oct 17 · ~14:38 to 14:50 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C3b only: <code>SaveSearchForm</code> in edit mode. Label and Note fields, Save and Cancel, a <code>role="alert"</code> error line, focus on Label when it opens</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> UI (save form wording, form errors), Focus; <code>SOT_documents/UI.md</code> Part 1 (buttons, hint color, accessibility)</li>
+      <li><code>components/SavedCard.tsx</code> (outline button style, focus pattern)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file, 1 modified
+    <ul>
+      <li>🟩 <code>components/SaveSearchForm.tsx</code> (new) · props <code>idPrefix</code>, <code>initialLabel</code>, <code>initialNote</code>, <code>onSubmit</code> (resolves to an error message or <code>null</code>), <code>onCancel</code>; own state <code>label</code>, <code>note</code>, <code>error</code>, <code>busy</code>; <code>useEffect</code> focuses Label on mount</li>
+      <li><code>PROMPT_LOG.md</code> (modified) · Entry 26 commit hash filled in, Entry 27 added</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>npx eslint components/SaveSearchForm.tsx</code>: no output</li>
+      <li>Not clickable yet: no card renders the form until C3c</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: one label and note form that edit uses now and create reuses in #8 [U1, E3, A2]</li>
+      <li>Input: props <code>idPrefix</code>, <code>initialLabel</code>, <code>initialNote</code>, <code>onSubmit</code>, <code>onCancel</code></li>
+      <li>Output: renders Label, Note with hint, an error line (<code>role="alert"</code>), Save and Cancel; calls <code>onSubmit(label, note)</code> or <code>onCancel()</code></li>
+      <li>Flow: mount → focus Label → typing → form state → Save → <code>onSubmit</code> → <code>null</code> or a message → error line</li>
+      <li>No <code>mode</code> prop: create vs edit is only what the parent passes in. No <code>maxLength</code>: the server's Zod rules decide, so an 81-character label can reach the 400 [E1]</li>
+      <li>New wording not in <code>design.md</code>: "Saving…" on the Save button while it waits</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>The label and note values are managed right inside the form, so if the server refuses what the user typed, the values stay and the user doesn't have to type them again.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 27 · #5 SaveSearchForm in edit mode</b>
+    <ul>
+      <li>What it is: the first form component in Week 5; it owns the draft label and note while the user types</li>
+      <li>Why: the card's Edit (C3c) and the result card's Save to watchlist (#8) need the same two fields, error line, and buttons</li>
+      <li>Files:
+        <ul>
+          <li><code>components/SaveSearchForm.tsx</code>: the form</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the UI half of edit and save; <code>SavedCard</code> opens it next, and <code>Navigator</code> supplies <code>onSubmit</code> in C3d</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 27 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>typing, Save, Cancel]:::run
+  SF[components/SaveSearchForm.tsx<br/>label, note, error, busy]:::ui
+  SC[components/SavedCard.tsx<br/>parent, C3c]:::ui
+  NAV[components/Navigator.tsx<br/>onSubmit PATCH, C3d]:::ui
+  BR --> SF
+  SC -->|initialLabel, initialNote| SF
+  SF -->|onSubmit label, note| NAV
+  NAV -->|null or error message| SF
+  SF -->|onCancel| SC
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```
