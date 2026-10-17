@@ -1798,3 +1798,92 @@ flowchart TD
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
+
+## Entry 22 · #4 DELETE /api/searches/[id]
+
+*Oct 17 · ~08:52 to 09:35 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Work issue #4. Step C2.1 only: <code>DELETE /api/searches/[id]</code> checks the id with Zod and deletes the row; 204, 400, 404, 500. Failed-delete wording on the page: reuse the 404 and 500 messages</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #4 ACs; <code>docs/spec/design.md</code> API contracts (DELETE), Validation (<code>idParam</code>), error messages; <code>docs/agents/issue-tracker.md</code></li>
+      <li><code>lib/validation.ts</code>, <code>lib/db.ts</code>, <code>app/api/searches/route.ts</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 new file
+    <ul>
+      <li>🟥 <code>app/api/searches/[id]/route.ts</code> (new) · <code>DELETE</code>: <code>await params</code> → <code>idParam.safeParse</code> (400) → <code>prisma.savedSearch.delete</code> → <code>204</code>; <code>P2025</code> → <code>404</code>; other errors → <code>500</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh issue comment 4</code>: <code>Started</code> posted 2026-10-17T13:52:30Z</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>14:18:55 GMT · <code>curl -X DELETE /api/searches/abc</code>: <code>400</code> "That is not a valid saved search id."</li>
+      <li>14:19:15 GMT · <code>curl -X DELETE /api/searches/99999</code>: <code>404</code> "That saved search no longer exists."</li>
+      <li>14:29:19 GMT · Joseph: <code>curl -i -X DELETE /api/searches/2</code>: <code>204 No Content</code>, no body</li>
+      <li>Joseph's Neon Tables view, <code>SavedSearch</code>: only id 1 HARRIS left (1 of 1)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: DELETE /api/searches/[id] removes a saved search; prompt log entry 22</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the server can delete one saved search by id and refuse bad or missing ids [D2, E1, E2]</li>
+      <li>Input: <code>params.id</code> from the URL, as text</li>
+      <li>Output: <code>204</code> with no body (row gone from Neon), or <code>400</code> / <code>404</code> / <code>500</code> with <code>{ error }</code></li>
+      <li>Flow: <code>curl</code> or browser <code>fetch</code> DELETE → <code>route.ts</code> → <code>await params</code> → Zod <code>idParam</code> → Prisma <code>delete</code> → Neon → <code>204</code> (or <code>P2025</code> → <code>404</code>)</li>
+      <li>New wording not in <code>design.md</code>: 400 "That is not a valid saved search id."</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>In this step we added a new route at <code>/api/searches/[id]</code>. The ids are unique to the data stored in the Neon database, and the delete function needs them.</li>
+      <li>The new route checks the id with Zod, asks Prisma to delete that row in Neon, and answers with 204, 400, 404, or 500.</li>
+      <li>This is important because Prisma throws an error code when no row has that id, and we turn it into a 404, a friendly message instead of a crash.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 22 · #4 DELETE /api/searches/[id]</b>
+    <ul>
+      <li>What it is: the second Route Handler, the first one that writes; the <code>[id]</code> folder makes one file answer for every id</li>
+      <li>Why: the Delete button (C2.2, C2.3) needs a server door that removes one row; Zod stops bad ids before they reach Neon</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/searches/[id]/route.ts</code>: <code>DELETE</code> now; <code>PATCH</code> joins in #5</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the server half of delete; the card and <code>Navigator</code> call it next</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 22 call graph
+
+```mermaid
+flowchart TD
+  CL[curl / Browser<br/>DELETE /api/searches/2]:::run
+  RT["app/api/searches/[id]/route.ts<br/>DELETE"]:::server
+  ZOD[lib/validation.ts<br/>idParam]:::server
+  DB[lib/db.ts<br/>prisma.savedSearch.delete]:::db
+  NEON[Neon dev<br/>SavedSearch]:::db
+  R204[204 no body]:::server
+  R400[400 not a valid id]:::server
+  R404[404 P2025 no longer exists]:::server
+  R500[500 database error]:::server
+  CL --> RT
+  RT --> ZOD
+  ZOD -->|fail| R400
+  ZOD -->|ok| DB
+  DB --> NEON
+  DB --> R204
+  DB -->|P2025| R404
+  DB -->|other| R500
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
