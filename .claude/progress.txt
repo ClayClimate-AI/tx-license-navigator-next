@@ -1,4 +1,5 @@
 stage: C
-step: C3 (issue #5, after commit + /clear)
+step: C3 (issue #5, after /clear)
 issue: #5
 title: Edit a saved search's label and note
+plan: see docs/spec/tasks.md "Replan · Sat Oct 17" and "Why the build ran over time and tokens". Order: #5 → #6 → #7 → #8 → #10 → #11, all today. #9 cut. Light recaps for repeats (memory understanding-levels).

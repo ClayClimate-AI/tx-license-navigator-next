@@ -25,6 +25,41 @@ At each checkpoint, compare against the list and apply the named cut if behind.
 | Sun 18:00 CT | #9 and #10 closed, #11 started | If #11 is blocked at 22:00, apply cut 4 |
 | Mon morning | demo prep (see Monday below) | — |
 
+## Replan · Sat Oct 17 (replaces the Sat and Sun checkpoints above)
+
+Decided by Joseph, Sat Oct 17 ~13:45 CT.
+
+- **Everything left finishes today.** Joseph has school work on Sunday, so no build work moves to Sunday.
+- **Order:** #5 Edit → #6 Search → #7 Live types → #8 Save → #10 Done check → #11 Deploy.
+- **#9 cut** (cut 1), closed `wontfix`: about 9 h of work were left against about 10.5 h in the day, and #9 is first in the cut order.
+- **#7 kept** and moved up to follow #6: two license types make the app feel thin, and #7 reuses #6's TDLR code while it's fresh. If #6 runs long, #7 moves after #11.
+- **#11 stays a must:** `requirements.md` V1 requires the live site. Cut 4 applies only if Netlify itself blocks.
+- **No early test deploy:** Joseph works one issue at a time, in order, to keep a clear picture of how the pieces connect.
+- **Lighter recaps from #5 on:** full recap and flow map for new patterns (#6, #8, #11), short ones for repeats (#5, #7, #10). Diff, accept, test, commit and push, and the prompt log stay the same for every step.
+
+## Why the build ran over time and tokens
+
+Estimates against actuals, closed issues (wall clock from `Started`, includes breaks and overnight gaps):
+
+| Issue | Estimate | Actual |
+|---|---|---|
+| #1 Project shell | 2.5 h | 12.5 h |
+| #2 Database ready | 3 h | 31.9 h |
+| #3 See my saved searches | 2 h | 2.25 h |
+| #4 Delete a saved search | 1 h | 4 h |
+
+Active time on the command center (gaps over 30 minutes count as breaks): Stage B 9 h 05 min, Stage C 6 h 35 min, as of Oct 17 ~13:30 CT.
+
+Why:
+
+1. **First full-stack build.** Joseph's first time with Neon, Postgres, Prisma 7, and route handlers together. The estimates assume someone already fluent in the stack. This build is his baseline, not a missed target.
+2. **Learning time, chosen on purpose.** Each step got a recap, a restatement, a reflection, and from #4 on a flow map. Joseph built the `flow-map` skill during #4. In the session for #4, Claude was working about 2 h and the rest was Joseph reading, testing, and writing.
+3. **Database setup cost the most.** #2 covered researching Prisma 7 with the Neon adapter, Neon branches, env vars, and the first migration. #3 then hit a `DATABASE_URL` pointing at the wrong Neon endpoint (PROMPT_LOG Entry 17).
+4. **Process fixes along the way.** Examples: commit and push made part of closing every step; the recap format reworked several times on Joseph's request.
+5. **Tokens.** Most tokens are cache reads of a long conversation, about 14.2 M in the #4 session, est. $7.70 for that session. They grow with session length, so long explanation threads cost the most. Step C2.3 used about 4.7 M while the flow map was redrawn several times. `/clear` between issues keeps this down.
+
+What changes from #5 on: the issue estimates are the plan (no 2× padding); light recaps for repeat patterns; the three-level bar for what Joseph needs to know (must know / recognize / look up).
+
 ## Cut order (fallback)
 
 Apply only at a checkpoint, in this order. A cut issue is closed with the `wontfix` label and a one-line reason. Never cut: CRUD, persistence, Zod, focus and announcements, the prompt log.

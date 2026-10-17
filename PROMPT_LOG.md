@@ -2117,7 +2117,7 @@ sequenceDiagram
       <li><code>gh issue edit 4</code> returned the issue URL</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> docs: #4 checks pass; prompt log entry 25 · Closes #4</td></tr>
+  <tr><td><b>Commit</b></td><td><code>e6497ce</code> docs: #4 checks pass; prompt log entry 25 · Closes #4</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: show #4 meets every acceptance criterion, so it can close</li>
