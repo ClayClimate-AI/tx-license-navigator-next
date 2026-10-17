@@ -1,4 +1,4 @@
 stage: C
-step: C1.5 (5 of 5)
-issue: #3
-title: Browser checks + close #3
+step: C2 (issue #4, after commit + /clear)
+issue: #4
+title: Delete a saved search

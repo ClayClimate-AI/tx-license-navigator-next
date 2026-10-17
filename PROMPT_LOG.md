@@ -1744,7 +1744,7 @@ flowchart TD
       <li><code>gh issue edit 3</code> returned the issue URL</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>33c81c3</code> docs: browser checks pass for #3; prompt log entry 21</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: show #3 works in a real browser against every acceptance criterion, so it can close</li>
