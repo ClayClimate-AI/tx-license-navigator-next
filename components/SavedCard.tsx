@@ -65,14 +65,14 @@ export default function SavedCard({ search, onDelete, onEdit }: Props) {
       {/* Edit mode swaps the label and note for the form; type and county stay. */}
       {mode !== "editing" && (
         // Focus target after a save (A2), so it takes tabIndex -1.
-        <h3 id={`saved-${search.id}-heading`} tabIndex={-1} className="text-[18px] font-bold text-[#14304F]">
+        <h3 id={`saved-${search.id}-heading`} tabIndex={-1} className="break-words text-[18px] font-bold text-[#14304F]">
           {search.label}
         </h3>
       )}
       <p className="text-[15px] text-[#2B3A49]">
         {search.licenseType} · {countyLabel(search.county)} County
       </p>
-      {mode !== "editing" && search.note && <p className="mt-1 text-[15px] text-[#2B3A49]">{search.note}</p>}
+      {mode !== "editing" && search.note && <p className="mt-1 break-words text-[15px] text-[#2B3A49]">{search.note}</p>}
 
       {mode === "editing" && (
         <SaveSearchForm

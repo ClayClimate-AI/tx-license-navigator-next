@@ -2367,7 +2367,7 @@ flowchart TD
       <li>Joseph: "Changes saved." showed after Save; the new label survived a reload [U1, A1]</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>9bf6d14</code> feat: Edit a saved search's label and note on its card; prompt log entry 28</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: a visitor changes a card's label and note in the browser, stored in Neon [U1, A1, A2]</li>
@@ -2425,4 +2425,93 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 29 · #5 Close-out checks and long-word fix
+
+*Oct 17 · ~15:40 to 16:25 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C3d: run the remaining #5 acceptance checks (keyboard focus, 81-character label), then close out. Joseph: "Fix number one" (add <code>break-words</code> after a long note overflowed the card)</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #5 ACs; <code>docs/agents/issue-tracker.md</code> (Actual); issue #4 body (close-out format)</li>
+      <li><code>components/SavedCard.tsx</code>, <code>README.md</code> Status table</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 files modified, 1 issue edited
+    <ul>
+      <li>🟩 <code>components/SavedCard.tsx</code> (modified) · <code>break-words</code> on the label <code>h3</code> and the note <code>p</code>, so a long word wraps inside the card</li>
+      <li><code>README.md</code> (modified) · Status: #5 ✅</li>
+      <li><code>PROMPT_LOG.md</code> (modified) · Entry 28 commit hash filled in, Entry 29 added</li>
+      <li>Issue #5 body: 5 boxes checked, <code>Actual: 2 h (wall clock, includes breaks)</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>Joseph's screenshot: 81 A's pasted into Note saved (note allows 280), and the unbroken string ran past the card's right border</li>
+      <li>Joseph's screenshot: 81 A's in Label → Save → "Check the label and note, then try again." in red above the buttons; form open, Label and Note kept [E1, E3]</li>
+      <li>Joseph: keyboard only, cursor in Label on open, focus back on Edit after Cancel and after Save [A2]</li>
+      <li>Joseph's screenshot after <code>break-words</code>: the note wraps to a second line inside the card</li>
+      <li>Earlier in #5: <code>curl</code> 400 with <code>county</code>, 404 for <code>99999</code> (Entry 26); "Changes saved." and reload (Entry 28)</li>
+      <li><code>gh issue edit 5</code>: Started 19:22:40Z, now 21:21:49Z → 1 h 59 min → Actual 2 h</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>(hash after Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: prove #5 against its acceptance criteria and close it [U1, U2, E1–E3, A1, A2]</li>
+      <li>Input: keyboard presses, an 81-character string, the browser</li>
+      <li>Output: all 5 ACs pass; long words wrap inside the card; issue #5 shows Actual; README Status shows #5 ✅</li>
+      <li>Flow: Joseph tests in the browser → screenshot → fix → re-test → <code>gh issue edit</code> → README → commit with <code>Closes #5</code></li>
+      <li>What differed: the first paste went into Note instead of Label, so it saved instead of being refused; it surfaced the overflow bug</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>In C3d we ran the acceptance checks and tested against what the issue promised, not what we expected the code to do.</li>
+      <li>I put the string of characters in the wrong field, but that turned out to be a good thing: the characters ran outside the card. Anyone could type a long URL, or any long text with no spaces, and it wouldn't wrap. Pasting into Note instead of Label didn't break any rule, but it showed a real bug: a long word spilling out of the card.</li>
+      <li>The fix was a Tailwind fix: we added <code>break-words</code> to <code>SavedCard</code> so the text wraps.</li>
+      <li>Testing with odd input, like a very long word in the wrong field, finds bugs that normal clicking probably never would.</li>
+      <li>The close-out checks showed me that we can get the logic right on the back end, in the IDE, or even on the front end, but it takes understanding the functionality underneath and testing it, not assuming, to find these errors, so the edge cases are already handled when the application is actually used.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 29 · #5 Close-out checks and long-word fix</b>
+    <ul>
+      <li>What it is: the acceptance pass for #5, plus one CSS fix found by it</li>
+      <li>Why: <code>break-words</code> (CSS <code>overflow-wrap: break-word</code>) lets the browser break a word with no spaces when it would overflow its box</li>
+      <li>Files:
+        <ul>
+          <li><code>components/SavedCard.tsx</code>: <code>break-words</code> on label and note</li>
+          <li><code>README.md</code>: Status table</li>
+        </ul>
+      </li>
+      <li>Its role in the project: closes #5 (the U in CRUD); unblocks #8 and #10</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 29 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>81 A's in Note, then Label]:::run
+  SF[components/SaveSearchForm.tsx<br/>error line]:::ui
+  SC[components/SavedCard.tsx<br/>break-words]:::ui
+  TW[tailwindcss<br/>overflow-wrap]:::css
+  RT["app/api/searches/[id]/route.ts<br/>PATCH 400"]:::server
+  BR -->|Label 81| SF
+  SF --> RT
+  RT -->|400 message| SF
+  BR -->|Note 81, saved| SC
+  SC --> TW
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef css fill:#c2410c,color:#fff,stroke:#fdba74
 ```

@@ -23,7 +23,7 @@ The app asks TDLR for counts and nothing else. It never fetches or shows names, 
 | | #2 | Database ready | ✅ |
 | C · Read, delete, edit | #3 | See my saved searches | ✅ |
 | | #4 | Delete a saved search | ✅ |
-| | #5 | Edit a saved search's label and note | ⬜ |
+| | #5 | Edit a saved search's label and note | ✅ |
 | D · Search and save | #6 | Search a license count | ⬜ |
 | | #7 | Live license types from TDLR | ⬜ |
 | | #8 | Save a search to the watchlist | ⬜ |
