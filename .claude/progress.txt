@@ -1,4 +1,4 @@
 stage: C
-step: C2.4 (4 of 4)
-issue: #4
-title: Close-out checks
+step: C3 (issue #5, after commit + /clear)
+issue: #5
+title: Edit a saved search's label and note

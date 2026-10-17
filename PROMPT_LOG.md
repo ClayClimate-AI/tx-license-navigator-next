@@ -2003,7 +2003,7 @@ flowchart TD
       <li>Joseph's Neon Tables view, <code>SavedSearch</code>: only id 1 HARRIS</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: Navigator deletes a saved search and announces it; prompt log entry 24</td></tr>
+  <tr><td><b>Commit</b></td><td><code>ef3ce9c</code> feat: Navigator deletes a saved search and announces it; prompt log entry 24</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the confirmed Delete removes the row, refreshes the list, and says so [D2, A1, A2]</li>
@@ -2081,4 +2081,91 @@ sequenceDiagram
   P-->>G: rows
   G-->>N: 200 searches
   N->>N: setSearches, focus heading
+```
+
+## Entry 25 · #4 Close-out checks
+
+*Oct 17 · after the <code>ef3ce9c</code> push to ~12:55 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step C2.4: check every #4 acceptance criterion against evidence, update the README Status table, tick the issue and add <code>Actual:</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #4 acceptance criteria (D1, D2, E1, E2, A1, A2, keyboard alone)</li>
+      <li>Evidence from Entries 22–24; <code>README.md</code> Status; <code>docs/agents/issue-tracker.md</code> (Actual rule)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 modified, plus the issue
+    <ul>
+      <li><code>README.md</code> (modified) · Status table: #4 ⬜ → ✅</li>
+      <li>GitHub issue #4 body · all 5 boxes ticked; <code>Actual: 4 h (wall clock, includes breaks)</code></li>
+      <li>No app code changed</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>AC 1 · C2.3: Travis card gone from the page; Neon <code>SavedSearch</code> shows only id 1</li>
+      <li>AC 2 · C2.2: Joseph, keyboard only, "Tests passed" (Keep returns to view, focus on Delete)</li>
+      <li>AC 3 · C2.3 screenshot: "Deleted." in the status line, focus ring on "My saved searches"</li>
+      <li>AC 4 · against the final code: <code>curl -X DELETE /api/searches/abc</code> → <code>400</code>; <code>/99999</code> → <code>404</code></li>
+      <li>AC 5 · Joseph confirmed the C2.3 delete was keyboard only</li>
+      <li>Actual: <code>Started</code> 2026-10-17T13:52:30Z to 17:53:25Z = 4 h 01 min → 4 h (estimate 1 h)</li>
+      <li><code>gh issue edit 4</code> returned the issue URL</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> docs: #4 checks pass; prompt log entry 25 · Closes #4</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: show #4 meets every acceptance criterion, so it can close</li>
+      <li>Input: the running dev server, Neon <code>dev</code>, Joseph's browser and keyboard, <code>curl</code></li>
+      <li>Output: 5 of 5 ACs pass; issue #4 ticked with Actual; README Status updated</li>
+      <li>Flow: <code>curl</code> 400/404 → browser and Neon evidence → <code>README.md</code> → <code>gh issue edit 4</code> → prompt log → commit with <code>Closes #4</code> → push closes the issue</li>
+      <li>What differed: actual 4 h against a 1 h estimate; the time includes breaks, the commit-and-push process fix, and building the <code>flow-map</code> skill</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This process was really informative. I took my time to understand the steps that explain how the CRUD functionality relates to the database, the server side, and the client side.</li>
+      <li>The most informative part was going through how the function for the method we were building was supposed to work, then stating what the application should do, evaluating the results, and talking about why the results were what they were, so I could tell when things were actually working the right way.</li>
+      <li>I took time to make flow charts. They helped me step out of the mindset of only learning how the database and Prisma work, and see how it all ties back to the front end and how Next.js and React work together.</li>
+      <li>The flow maps gave me a fuller picture. Not just that we created a database as part of the app, but how the CRUD functions are used on the front end: how data gets broken down and destructured, which components show different information and change state and effects, and how rendering works, with React holding things in memory.</li>
+      <li>There's still a lot to learn, but this tied the delete functionality together for me end to end, and that was really neat.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 25 · #4 Close-out checks</b>
+    <ul>
+      <li>What it is: proving each acceptance criterion with evidence, then recording that #4 is done</li>
+      <li>Why: an issue closes on proof, and the README and <code>Actual:</code> keep the project's status and planning honest</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: Status row for #4</li>
+        </ul>
+      </li>
+      <li>Its role in the project: delete is the first write in the watchlist's CRUD; edit (#5) reuses the same route file and the same card → <code>Navigator</code> → route → refetch shape</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 25 call graph
+
+```mermaid
+flowchart TD
+  CURL[curl DELETE abc and 99999<br/>400 and 404]:::run
+  BR[Joseph browser and keyboard<br/>C2.2 and C2.3 evidence]:::run
+  NEON[Neon dev<br/>only id 1 left]:::db
+  RM[README.md<br/>Status 4 done]:::run
+  GH[GitHub issue 4<br/>boxes ticked, Actual 4 h]:::run
+  CL[commit Closes 4<br/>push closes the issue]:::run
+  CURL --> RM
+  BR --> RM
+  NEON --> RM
+  RM --> GH
+  GH --> CL
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
