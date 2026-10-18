@@ -2547,7 +2547,7 @@ flowchart TD
       <li>Called for real through the route in Entry 31</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
+  <tr><td><b>Commit</b></td><td><code>82a6d80</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can ask TDLR for a holder count, and the browser never calls TDLR [P1]</li>
@@ -2622,7 +2622,7 @@ flowchart TD
       <li>504 timeout not yet checked (planned for D6)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
+  <tr><td><b>Commit</b></td><td><code>82a6d80</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the page can get a TDLR count from our server, and the browser never calls TDLR [S3, S6, S7, P1]</li>
@@ -2701,4 +2701,81 @@ sequenceDiagram
   A-->>T: [{ holders: "12095" }] (or error, or no answer)
   T-->>R: 12095 (or throw TdlrError)
   R-->>C: 200 { count, queryUrl } (or 502 / 504)
+```
+
+## Entry 32 · #6 LicensePicker
+
+*Oct 18 · ~00:20 to 00:45 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go D3: port Week 4's <code>LicensePicker.jsx</code> with the two HVAC types and the 13 counties</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Week 4 <code>src/components/LicensePicker.jsx</code>, read with <code>gh api</code> (read only)</li>
+      <li><code>SOT_documents/UI.md</code> Part 1 (Form, Accessibility); <code>app/globals.css</code> (global focus ring); <code>lib/counties.ts</code>; <code>components/SavedList.tsx</code> (the <code>Props</code> pattern)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file new
+    <ul>
+      <li>🟩 <code>components/LicensePicker.tsx</code> (new) · exports <code>HVAC_TYPES</code>; props <code>type</code>, <code>county</code>, <code>busy</code>, <code>fieldError</code>, <code>onTypeChange</code>, <code>onCountyChange</code>, <code>onSubmit</code>; Week 4 labels, hints, county error, and "Show license count" / "Checking…"</li>
+      <li>Changed from Week 4: <code>HVAC_TYPES</code> moved here (<code>lib/tdlr.ts</code> is server-only); only the HVAC group until #7; <code>busy</code> no longer disables the type select; per-element focus classes dropped (<code>globals.css</code> draws the ring)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>Not on the page yet; <code>Navigator</code> renders it in D5</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: LicensePicker form with the HVAC types and 13 counties; prompt log entry 32</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the search form exists, ready for <code>Navigator</code> to show [S2]</li>
+      <li>Input: props <code>type</code>, <code>county</code>, <code>busy</code>, <code>fieldError</code> and three handlers</li>
+      <li>Output: the rendered form; <code>onTypeChange(value)</code>, <code>onCountyChange(value)</code>, <code>onSubmit()</code> calls up</li>
+      <li>Flow: <code>Navigator</code> state → props → <code>&lt;select value&gt;</code> → visitor changes it → <code>onChange</code> → handler → <code>Navigator</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>LicensePicker</code> is really just a dumb form. All the values live in <code>Navigator</code>; the form shows them and calls up when the visitor does something.</li>
+      <li>Props that come down: <code>type</code>, <code>county</code>, <code>busy</code>, and <code>fieldError</code>. Calls that go up: <code>onTypeChange(value)</code>, <code>onCountyChange(value)</code>, and <code>onSubmit()</code>, back to <code>Navigator</code>.</li>
+      <li><code>HVAC_TYPES</code> moved into the form because <code>tdlr.ts</code> is server side. Only the HVAC group shows until #7, and the focus ring comes from <code>globals.css</code>.</li>
+      <li>In summary, the form collects the question and never asks the server itself. It never touches <code>/api/count</code> or TDLR; it shows the dropdowns and reports what the visitor did.</li>
+      <li>Then <code>Navigator</code>'s submit handler runs <code>fetch /api/count?type=A/C Technician&amp;county=HARRIS</code>, and from there it's the same path we mapped in D2: <code>countQuery</code> → <code>tdlr.ts</code> <code>fetchHolderCount</code> → TDLR API → 200 with the key-value object. <code>Navigator</code> stores the result in state and passes it down to <code>ResultCard</code>, which shows the count.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 32 · #6 LicensePicker</b>
+    <ul>
+      <li>What it is: the Week 4 search form as a props-only component</li>
+      <li>Why: <code>Navigator</code> owns page state (design.md, State ownership), so the form only shows values and reports events</li>
+      <li>Files:
+        <ul>
+          <li><code>components/LicensePicker.tsx</code>: the form and <code>HVAC_TYPES</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: the "ask" half of search in the browser; <code>ResultCard</code> (D4) is the "answer" half, and <code>Navigator</code> (D5) connects both to <code>/api/count</code></li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 32 call graph
+
+```mermaid
+flowchart TD
+  NAV[components/Navigator.tsx<br/>owns type, county, busy, fieldError<br/>wired in D5]:::ui
+  LP[components/LicensePicker.tsx<br/>form]:::ui
+  CO[lib/counties.ts<br/>COUNTIES]:::ui
+  BR[Browser<br/>visitor picks, clicks]:::run
+  NAV -->|props down| LP
+  CO --> LP
+  BR --> LP
+  LP -->|onTypeChange, onCountyChange, onSubmit up| NAV
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```
