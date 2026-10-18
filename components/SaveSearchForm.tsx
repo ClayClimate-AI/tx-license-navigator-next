@@ -12,7 +12,7 @@ type Props = {
 
 const field = "mt-1 w-full rounded border border-[#C7D0DB] bg-white px-3 py-2 text-[16px] text-[#1B2733]";
 
-// Label and note form. Edit mode now (#5); create mode reuses it in #8 with a prefilled label.
+// Label and note form. Edit mode on a saved card (#5); create mode in the result card, label prefilled (#8). [C3]
 export default function SaveSearchForm({ idPrefix, initialLabel, initialNote, onSubmit, onCancel }: Props) {
   const [label, setLabel] = useState(initialLabel);
   const [note, setNote] = useState(initialNote);

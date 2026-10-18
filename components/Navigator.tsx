@@ -188,6 +188,8 @@ export default function Navigator() {
         queryUrl={result?.queryUrl ?? ""}
         errorCode={errorCode}
         onRetry={() => lastSearch && runSearch(lastSearch)}
+        // Placeholder until D3 wires POST /api/searches.
+        onSave={async () => "Saving is not wired yet (step D3)."}
       />
       <SavedList searches={searches} status={listStatus} onRetry={retry} onDelete={handleDelete} onEdit={handleEdit} />
     </>

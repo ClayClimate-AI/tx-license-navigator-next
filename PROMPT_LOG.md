@@ -3082,7 +3082,7 @@ flowchart TD
       <li>DALLAS with <code>"label":""</code> → <code>400</code> "Check the label and note, then try again." (400, not 409: Zod runs before the database)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>a3df9ef</code> feat: POST /api/searches with 400, 409, 500; prompt log entry 36</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can save a search, the "C" in CRUD</li>
@@ -3139,4 +3139,89 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 37 · #8 Save to watchlist button and form
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go: step D2, "Save to watchlist" on the result card opening the save form with the label prefilled</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> UI wording, Focus [A2]; requirements C1, C3</li>
+      <li><code>components/ResultCard.tsx</code>, <code>SaveSearchForm.tsx</code>, <code>SavedCard.tsx</code> (focus-back pattern), <code>Navigator.tsx</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    3 files modified
+    <ul>
+      <li>🟩 <code>components/ResultCard.tsx</code> (modified) · new prop <code>onSave(label, note)</code>; new <code>SaveToWatchlist</code> inside the success and empty panels only: <code>useState</code> <code>open</code>, button ↔ <code>SaveSearchForm</code> (<code>idPrefix="save"</code>, label "{type} in {county} County"); Cancel focuses the button via <code>useRef</code> + <code>useEffect([open])</code></li>
+      <li>🟩 <code>components/SaveSearchForm.tsx</code> (modified) · comment only: create mode now in use</li>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · placeholder <code>onSave</code> returning "Saving is not wired yet (step D3)."; D3 replaces it</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output · <code>npx eslint</code> on the three components: no output</li>
+      <li>Joseph, browser (screenshot): Harris success card with the form open inside it; label prefilled "A/C Technician in Harris County"; note "hi" typed; Save → red "Saving is not wired yet (step D3)." and the typed values stay</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: a visitor can open a save form inside the result card [C1, C3]</li>
+      <li>Input: <code>onSave</code> prop from <code>Navigator</code>; the card's own <code>type</code> and <code>county</code> for the prefilled label</li>
+      <li>Output: "Save to watchlist" on success and empty only; the form with the label prefilled and focused; Cancel returns focus to the button</li>
+      <li>Flow: click → <code>setOpen(true)</code> → <code>SaveSearchForm</code> → Save → <code>save()</code> → <code>onSave</code> (placeholder) → message back down → red text, typed values stay</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The result card now owns a small Save to watchlist piece that opens the shared form and passes the save up to the <code>Navigator</code>. The actual save isn't wired yet; that's D3.</li>
+      <li>Before any search there's no Save button; the card stays idle. Say we select Harris and Show license count: the button appears under "A count is not a job listing." We click it, the label reads "A/C Technician in Harris County", and the cursor is in Label. Cancel brings the button back with keyboard focus on it.</li>
+      <li>Then we open the form again and press Save, and red text appears: "Saving is not wired yet." That's where we are, because we don't have D3 yet.</li>
+      <li>If we select Loving County and show the license count, the empty card also has the button (C1). With <code>?break=column</code>, the pink error card has no button.</li>
+      <li>Next, in D3, <code>Navigator</code>'s <code>handleSave</code> handles the actual saving: it sends the result's type and county to <code>POST /api/searches</code>, refetches the list so we can see exactly what was saved, and focuses the new card. One file, <code>Navigator.tsx</code>, about 25 minutes, no <code>tasks.md</code> checkpoint crossed.</li>
+      <li>So we set up the flow for what's displayed on the result card, and how values and hooks play their role: how they're passed down, and when calls are made back up to the <code>Navigator</code>.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 37 · #8 Save to watchlist button and form</b>
+    <ul>
+      <li>What it is: the browser half of save, up to the point where <code>Navigator</code> takes over</li>
+      <li>Why: the button and form live in a small child (<code>SaveToWatchlist</code>) inside the success and empty panels, so every new search (which passes through loading) unmounts it and the form starts closed</li>
+      <li>Files:
+        <ul>
+          <li><code>components/ResultCard.tsx</code>: <code>onSave</code> prop, <code>SaveToWatchlist</code></li>
+          <li><code>components/SaveSearchForm.tsx</code>: comment</li>
+          <li><code>components/Navigator.tsx</code>: placeholder <code>onSave</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: D3 swaps the placeholder for <code>handleSave</code>, which calls the D1 route</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 37 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Save to watchlist click]:::run
+  NAV[components/Navigator.tsx<br/>onSave placeholder]:::ui
+  RC[components/ResultCard.tsx<br/>success or empty panel]:::ui
+  SW[components/ResultCard.tsx<br/>SaveToWatchlist open state]:::ui
+  SF[components/SaveSearchForm.tsx<br/>label prefilled]:::ui
+  NAV -->|props down: onSave| RC
+  RC -->|initialLabel, onSave| SW
+  BR --> SW
+  SW -->|open = true| SF
+  SF -->|onSubmit up| SW
+  SW -->|onSave up| NAV
+  NAV -->|message down| SF
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```

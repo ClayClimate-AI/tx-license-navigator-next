@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { countyLabel } from "@/lib/counties";
+import SaveSearchForm from "./SaveSearchForm";
 
 export type ResultStatus = "idle" | "loading" | "success" | "empty" | "error";
 
@@ -10,6 +12,8 @@ type Props = {
   queryUrl: string;
   errorCode: number | null; // TDLR's code, or null for a timeout or no connection
   onRetry: () => void;
+  // Resolves to an error message for the save form, or null when the save worked. [C4]
+  onSave: (label: string, note: string) => Promise<string | null>;
 };
 
 // Navigator focuses #result-heading after each search, so the finished states give it tabIndex -1. [A2]
@@ -17,8 +21,9 @@ const headingClass = "text-[18px] font-bold text-[#1B2733]";
 const section = "mt-3 rounded-md p-5";
 
 // One result region with five states, ported from Week 4. Wording from UI.md Part 1. [S4]
-export default function ResultCard({ status, type, county, count, queryUrl, errorCode, onRetry }: Props) {
+export default function ResultCard({ status, type, county, count, queryUrl, errorCode, onRetry, onSave }: Props) {
   const place = `${countyLabel(county)} County`;
+  const label = `${type} in ${place}`;
 
   if (status === "loading") {
     return (
@@ -61,6 +66,7 @@ export default function ResultCard({ status, type, county, count, queryUrl, erro
           TDLR lists no {type} licenses with {place} as the business county.
         </p>
         <p className="text-[15px] text-[#4A5A6A]">Try a nearby county or the other license type.</p>
+        <SaveToWatchlist initialLabel={label} onSave={onSave} />
         <RequestDetails queryUrl={queryUrl} />
       </section>
     );
@@ -76,6 +82,7 @@ export default function ResultCard({ status, type, county, count, queryUrl, erro
           people hold this license with {place} listed as their business county.
         </p>
         <p className="mt-3 rounded bg-[#F3F5F8] p-3 text-[15px]">A count is not a job listing.</p>
+        <SaveToWatchlist initialLabel={label} onSave={onSave} />
         <RequestDetails queryUrl={queryUrl} />
       </section>
     );
@@ -86,6 +93,54 @@ export default function ResultCard({ status, type, county, count, queryUrl, erro
       <h2 id="result-heading" className={headingClass}>Your result will appear here</h2>
       <p className="mt-0.5 text-[15px] text-[#4A5A6A]">Pick a license type and a county, then select Show license count.</p>
     </section>
+  );
+}
+
+// "Save to watchlist" and its form, only inside the success and empty panels. [C1]
+// A new search passes through loading, which unmounts this, so the form always starts closed.
+function SaveToWatchlist({ initialLabel, onSave }: { initialLabel: string; onSave: Props["onSave"] }) {
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // Set only by Cancel: focus goes back to the button that opened the form. [A2]
+  const backToButton = useRef(false);
+
+  useEffect(() => {
+    if (!open && backToButton.current) {
+      buttonRef.current?.focus();
+      backToButton.current = false;
+    }
+  }, [open]);
+
+  // After a save, Navigator focuses the new card (A2), so the form only closes here.
+  async function save(label: string, note: string) {
+    const error = await onSave(label, note);
+    if (error === null) setOpen(false);
+    return error;
+  }
+
+  if (open) {
+    return (
+      <SaveSearchForm
+        idPrefix="save"
+        initialLabel={initialLabel}
+        initialNote=""
+        onSubmit={save}
+        onCancel={() => {
+          backToButton.current = true;
+          setOpen(false);
+        }}
+      />
+    );
+  }
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      onClick={() => setOpen(true)}
+      className="mt-3 rounded bg-[#14304F] px-4 py-2 text-[15px] font-bold text-white hover:bg-[#0E2238]"
+    >
+      Save to watchlist
+    </button>
   );
 }
 
