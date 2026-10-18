@@ -2547,7 +2547,7 @@ flowchart TD
       <li>Called for real through the route in Entry 31</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending · Joseph commits</td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can ask TDLR for a holder count, and the browser never calls TDLR [P1]</li>
@@ -2622,7 +2622,7 @@ flowchart TD
       <li>504 timeout not yet checked (planned for D6)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending · Joseph commits</td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: lib/tdlr.ts and GET /api/count for the TDLR holder count; prompt log entries 30-31</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the page can get a TDLR count from our server, and the browser never calls TDLR [S3, S6, S7, P1]</li>
