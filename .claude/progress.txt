@@ -1,4 +1,4 @@
-stage: D
-step: D3 (3 of 4)
-issue: #8
-title: Navigator handleSave
+stage: E
+step: next issue #10 (after /clear)
+issue: #10
+title: Done check

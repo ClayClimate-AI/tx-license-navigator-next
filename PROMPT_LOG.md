@@ -3257,7 +3257,7 @@ flowchart TD
       <li>Joseph reported: saving the same pair again showed "You already saved this search." and kept the typed note [C4]</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>f6cb769</code> feat: handleSave posts the searched pair, refetches, announces and focuses; prompt log entry 38</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: Save to watchlist stores the search; the C in CRUD now runs browser to database</li>
@@ -3310,4 +3310,81 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 39 · #8 Close-out checks
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go: step D4, the 6 acceptance criteria, Actual, README status, closing #8</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #8 ACs; <code>docs/agents/issue-tracker.md</code> (Actual); evidence from Entries 36–38</li>
+      <li><code>lib/counties.ts</code> (BEXAR is valid), <code>README.md</code> Status</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified, 1 issue edited
+    <ul>
+      <li><code>README.md</code> (modified) · Status: #8 ✅</li>
+      <li>Issue #8 body: all 6 boxes ticked, <code>Actual: 3.5 h (wall clock, includes breaks)</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>C1 idle: <code>curl /</code> has "Your result will appear here", no "Save to watchlist" · success and empty: Harris and Loving screenshots (Entries 37, 38) · error: Joseph's <code>?break=column</code> screenshot, pink card with Try again only</li>
+      <li>C2: label "A/C Technician in harris county", stored A/C Technician · Dallas County (Entry 38)</li>
+      <li>C3: prefilled label (Entry 37 screenshot); <code>curl</code> 81-char label → <code>400</code>; 281-char note → <code>400</code> (county BEXAR is valid, <code>lib/counties.ts:8</code>)</li>
+      <li>A1, A2: "Saved.", Loving card first, focus ring on its heading (Entry 38)</li>
+      <li>C4: <code>curl</code> 409 (Entry 36); Joseph reported the form message with the note kept (Entry 38)</li>
+      <li>Empty label: <code>curl</code> 400 (Entry 36); Joseph's screenshot, Bexar 5,100, red "Check the label and note, then try again." in the form</li>
+      <li><code>gh issue edit 8</code>: boxes ticked, Actual 3.5 h (Started 15:49:01Z, now 19:12:48Z)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: prove every #8 acceptance criterion and close the issue</li>
+      <li>Input: the running app, <code>curl</code>, Joseph's screenshots, the issue body</li>
+      <li>Output: 6 of 6 criteria with evidence; issue body and README updated</li>
+      <li>Flow: map criteria to evidence → fill gaps (idle <code>curl</code>, length <code>curl</code>s, error and empty-label screenshots) → tick the issue → Actual → README → log</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>none</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 39 · #8 Close-out checks</b>
+    <ul>
+      <li>What it is: the evidence pass that closes #8</li>
+      <li>Why: each criterion needs something seen, not assumed; the length tests used a valid county so the 400 could only come from the length</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: Status</li>
+        </ul>
+      </li>
+      <li>Its role in the project: create, read, update, delete all work; #10 Done check is next</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 39 call graph
+
+```mermaid
+flowchart TD
+  CL[curl<br/>POST /api/searches]:::run
+  BR[Browser<br/>result card states]:::run
+  RT[app/api/searches/route.ts<br/>POST]:::server
+  ZD[lib/validation.ts<br/>createBody]:::server
+  RC[components/ResultCard.tsx<br/>Save shown on success and empty only]:::ui
+  R400[400 label over 80, note over 280]:::server
+  CL --> RT
+  RT --> ZD
+  ZD -->|fails| R400
+  BR --> RC
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
 ```

@@ -26,7 +26,7 @@ The app asks TDLR for counts and nothing else. It never fetches or shows names, 
 | | #5 | Edit a saved search's label and note | ✅ |
 | D · Search and save | #6 | Search a license count | ✅ |
 | | #7 | Live license types from TDLR | ⬜ |
-| | #8 | Save a search to the watchlist | ⬜ |
+| | #8 | Save a search to the watchlist | ✅ |
 | E · Counts and done check | #9 | Live counts on saved cards | ✂️ cut |
 | | #10 | Done check | ⬜ |
 | F · Deploy | #11 | Deploy to Netlify | ⬜ |
