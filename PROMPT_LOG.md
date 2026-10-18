@@ -2811,7 +2811,7 @@ flowchart TD
       <li>Not on the page yet; <code>Navigator</code> renders it in D5</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: ResultCard with the five Week 4 result states; shared countyLabel; prompt log entry 33</td></tr>
+  <tr><td><b>Commit</b></td><td><code>54d86c6</code> feat: ResultCard with the five Week 4 result states; shared countyLabel; prompt log entry 33</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the answer box exists, ready to show any search outcome [S4, S5, S6]</li>
@@ -2861,4 +2861,107 @@ flowchart TD
   RC -->|onRetry up| NAV
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 34 · #6 Search wired into Navigator
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go: step D5, wire <code>LicensePicker</code> and <code>ResultCard</code> into <code>Navigator</code> with <code>fetch /api/count</code>, the status line, and focus</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Week 4 <code>src/App.jsx</code> (<code>runSearch</code>, <code>handleSubmit</code>, focus effect) and <code>src/components/StatusMessage.jsx</code> (status wording), read with <code>gh api</code> (read only)</li>
+      <li><code>docs/spec/design.md</code> State ownership, UI page order; <code>components/Navigator.tsx</code>, <code>LicensePicker.tsx</code>, <code>ResultCard.tsx</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · state <code>type</code>, <code>county</code>, <code>fieldError</code>, <code>status</code>, <code>errorCode</code>, <code>result</code>, <code>lastSearch</code>; <code>runSearch</code> → <code>fetch /api/count</code> (passes <code>?break=column</code> on); <code>handleSubmit</code> (county check), <code>handleCountyChange</code>; <code>useEffect([status])</code> focuses <code>#result-heading</code>; render order picker · status line · card · saved list</li>
+      <li>Status line starts "Ready. Choose a license type and a county." and uses the Week 4 search wording; no separate <code>StatusMessage</code> component (Joseph's call at planning)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output · <code>npx eslint</code> on the three search components: no output</li>
+      <li><code>curl</code> <code>/</code>: HTML has "Show license count", "Ready. Choose a license type and a county.", "Your result will appear here"</li>
+      <li>Joseph, browser: Harris shows the count; Loving shows the empty card; no county shows "Choose a county."; <code>/?break=column</code> shows "Something went wrong (error 400). Your choices are saved." and the pink card with "(error 400)" and Try again (screenshot); saved cards still work</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: search wired into Navigator with status line and focus; prompt log entry 34</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: a visitor can search and see the TDLR count on the page [S3–S7]</li>
+      <li>Input: the visitor's <code>type</code> and <code>county</code>; <code>?break=column</code> from the page URL</li>
+      <li>Output: one of five <code>ResultCard</code> panels, the status line, focus on the result heading</li>
+      <li>Flow: Show license count → <code>LicensePicker</code> <code>onSubmit()</code> → <code>handleSubmit</code> → <code>runSearch</code> → <code>fetch /api/count</code> → <code>route.ts</code> → Zod → <code>tdlr.ts</code> → TDLR → JSON → setters → React redraws → <code>useEffect</code> focuses <code>#result-heading</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The purpose is displaying what came back on the result card: the TDLR count on the page. This is #6's main behavior.</li>
+      <li>Input: the visitor chooses a type and a county, for example A/C Technician in Harris, plus <code>?break=column</code> on the page URL for the demo. Output: the result card shows one of five panels, the status line says what happened, and focus moves to the result heading.</li>
+      <li>Flow: Show license count → <code>LicensePicker</code> <code>onSubmit</code> → <code>Navigator</code> handles the submit with the county check → <code>runSearch</code> → <code>fetch /api/count</code> → <code>route.ts</code> checks it → <code>tdlr.ts</code> has the functions that make the request and handle the data coming back from TDLR → JSON → <code>setResult</code> stores the new value, <code>setStatus</code> sets the status from what came back, <code>setMessage</code> says what that status is → React redraws → focus moves to the result heading.</li>
+      <li>So this step was the setup: handler functions respond to the visitor's selection, the request goes to TDLR and back, state changes, and the values from the data are displayed on the card.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 34 · #6 Search wired into Navigator</b>
+    <ul>
+      <li>What it is: the browser half of search; <code>Navigator</code> is the only piece that calls <code>fetch</code></li>
+      <li>Why: design.md State ownership puts page state in <code>Navigator</code>; the form and the card stay props-only, like the saved cards</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: search state, <code>runSearch</code>, <code>handleSubmit</code>, focus effect</li>
+        </ul>
+      </li>
+      <li>Its role in the project: completes the search; <code>lastSearch</code> is what #8 saves to the watchlist</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 34 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Show license count]:::run
+  LP[components/LicensePicker.tsx<br/>onSubmit]:::ui
+  NAV[components/Navigator.tsx<br/>handleSubmit → runSearch]:::ui
+  RT[app/api/count/route.ts<br/>GET]:::server
+  FH[lib/tdlr.ts<br/>fetchHolderCount]:::tdlr
+  API[TDLR API]:::run
+  RC[components/ResultCard.tsx<br/>one of five panels]:::ui
+  BR --> LP
+  LP -->|onSubmit up| NAV
+  NAV -->|fetch /api/count| RT
+  RT --> FH
+  FH --> API
+  RT -->|JSON| NAV
+  NAV -->|props down| RC
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+### Entry 34 async sequence
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant N as Navigator
+  participant R as /api/count
+  participant T as TDLR API
+  B->>N: onSubmit()
+  N->>N: setStatus("loading"), setMessage("Checking…")
+  N->>R: fetch /api/count?type=&county=
+  R->>T: SoQL count, 8 s timer
+  T-->>R: [{ holders: "12095" }]
+  R-->>N: 200 { count, queryUrl }
+  N->>N: setResult, setStatus("success"), setMessage("Done…")
+  N->>B: React redraws, then useEffect focuses #result-heading
 ```

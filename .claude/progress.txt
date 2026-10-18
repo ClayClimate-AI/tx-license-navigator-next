@@ -1,4 +1,4 @@
 stage: D
-step: D4 (4 of 6)
+step: D5 (5 of 6)
 issue: #6
-title: ResultCard
+title: Wire search into Navigator
