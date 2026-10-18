@@ -1,4 +1,4 @@
 stage: D
-step: D2 (2 of 4)
+step: D3 (3 of 4)
 issue: #8
-title: Save to watchlist button and form in ResultCard
+title: Navigator handleSave

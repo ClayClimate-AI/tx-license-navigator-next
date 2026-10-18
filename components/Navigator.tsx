@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { countyLabel } from "@/lib/counties";
 import LicensePicker, { HVAC_TYPES } from "./LicensePicker";
 import ResultCard, { type ResultStatus } from "./ResultCard";
@@ -29,14 +29,16 @@ export default function Navigator() {
   // TDLR's code (or ours for a 400); null means no answer at all.
   const [errorCode, setErrorCode] = useState<number | null>(null);
   const [result, setResult] = useState<Result | null>(null);
-  // The last search sent, so Try again repeats exactly that one (and #8 saves it).
+  // The last search sent, so Try again repeats exactly that one. Save uses result, the pair on the card.
   const [lastSearch, setLastSearch] = useState<Search | null>(null);
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [listStatus, setListStatus] = useState<ListStatus>("loading");
   // Bumping this refetches the list (Try again now; after save, edit, delete later). [R5]
   const [reloadKey, setReloadKey] = useState(0);
-  // Status line text: search, edit, and delete fill it; save in #8. [A1]
+  // Status line text: search, save, edit, and delete fill it. [A1]
   const [message, setMessage] = useState("Ready. Choose a license type and a county.");
+  // Id of a just-saved search; its card is not on the page until the list redraws. [A2]
+  const focusAfterSave = useRef<number | null>(null);
 
   // After a search finishes, focus the result heading so keyboard and screen reader users land on the answer. [A2]
   useEffect(() => {
@@ -44,6 +46,13 @@ export default function Navigator() {
       document.getElementById("result-heading")?.focus();
     }
   }, [status]);
+
+  // After a save, once the new card is drawn, focus its heading. [A2]
+  useEffect(() => {
+    if (focusAfterSave.current === null) return;
+    document.getElementById(`saved-${focusAfterSave.current}-heading`)?.focus();
+    focusAfterSave.current = null;
+  }, [searches]);
 
   // Browser → GET /api/count → result card and status line. [S3–S7]
   async function runSearch(search: Search) {
@@ -137,6 +146,39 @@ export default function Navigator() {
     document.getElementById("saved-heading")?.focus();
   }
 
+  // Result card's form pressed Save: POST → refetch → status line → focus the new card.
+  // Returns the form's error, or null. [C2, C4, A1, A2]
+  async function handleSave(label: string, note: string): Promise<string | null> {
+    // The card offers Save only after a success or empty result, so result is set.
+    if (!result) return DB_ERROR;
+    setMessage("");
+    let res: Response;
+    try {
+      res = await fetch("/api/searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // The searched pair from the result, not the current selects. [C2]
+        body: JSON.stringify({ licenseType: result.type, county: result.county, label, note }),
+      });
+    } catch {
+      return DB_ERROR;
+    }
+    if (!res.ok) {
+      // 400 or 409: show the server's message in the form, typed values stay. [C4]
+      const data: { error?: string } | null = await res.json().catch(() => null);
+      return data?.error ?? DB_ERROR;
+    }
+    const data: { search: SavedSearch } = await res.json();
+    setMessage("Saved.");
+    focusAfterSave.current = data.search.id;
+    try {
+      setSearches(await fetchSearches());
+    } catch {
+      setListStatus("error");
+    }
+    return null;
+  }
+
   // Card's form pressed Save: PATCH → refetch → status line. Returns the form's error, or null. [U1, E3, A1]
   // The card moves focus back to its Edit button once this returns null. [A2]
   async function handleEdit(id: number, label: string, note: string): Promise<string | null> {
@@ -188,8 +230,7 @@ export default function Navigator() {
         queryUrl={result?.queryUrl ?? ""}
         errorCode={errorCode}
         onRetry={() => lastSearch && runSearch(lastSearch)}
-        // Placeholder until D3 wires POST /api/searches.
-        onSave={async () => "Saving is not wired yet (step D3)."}
+        onSave={handleSave}
       />
       <SavedList searches={searches} status={listStatus} onRetry={retry} onDelete={handleDelete} onEdit={handleEdit} />
     </>

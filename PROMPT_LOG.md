@@ -3170,7 +3170,7 @@ flowchart TD
       <li>Joseph, browser (screenshot): Harris success card with the form open inside it; label prefilled "A/C Technician in Harris County"; note "hi" typed; Save → red "Saving is not wired yet (step D3)." and the typed values stay</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>8600ae1</code> feat: Save to watchlist button and form in ResultCard; prompt log entry 37</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: a visitor can open a save form inside the result card [C1, C3]</li>
@@ -3224,4 +3224,90 @@ flowchart TD
   NAV -->|message down| SF
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 38 · #8 Navigator handleSave
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go: step D3, <code>Navigator</code> <code>handleSave</code> (POST, refetch, "Saved.", focus the new card)</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> Flows: Save, Focus [A2]; requirements C2, C4, A1, A2</li>
+      <li><code>components/Navigator.tsx</code> (<code>handleEdit</code>, <code>handleDelete</code> patterns), <code>SavedCard.tsx</code> (heading id), <code>app/globals.css</code> (<code>:focus-visible</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · <code>handleSave(label, note)</code>: <code>fetch POST /api/searches</code> with <code>result.type</code> and <code>result.county</code> [C2]; 400/409 → server message back to the form [C4]; 201 → "Saved." [A1], new id into <code>useRef</code> <code>focusAfterSave</code>, refetch the list; <code>useEffect([searches])</code> focuses <code>#saved-{id}-heading</code> after the redraw [A2]; placeholder <code>onSave</code> replaced; <code>lastSearch</code> comment corrected</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output · <code>npx eslint components/Navigator.tsx</code>: no output</li>
+      <li><code>curl</code> <code>GET /api/searches</code>: id 8 A/C Technician · TARRANT, label "A/C Technician in Tarrant County" (prefilled), note "Testing", saved through the UI</li>
+      <li>Joseph, browser (screenshot): Loving saved → status "Saved.", Loving card first, form closed [A1]</li>
+      <li>Joseph, browser (screenshot, keyboard save): yellow focus ring on the new "A/C Technician in Loving County" heading [A2]</li>
+      <li>Joseph, browser (screenshot): label typed "A/C Technician in harris county", stored pair A/C Technician · Dallas County [C2]</li>
+      <li>Joseph reported: saving the same pair again showed "You already saved this search." and kept the typed note [C4]</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: Save to watchlist stores the search; the C in CRUD now runs browser to database</li>
+      <li>Input: <code>label</code>, <code>note</code> from the form; <code>result.type</code>, <code>result.county</code> from the card</li>
+      <li>Output: new Neon row, "Saved.", the new card first with focus; or the server's message in the form</li>
+      <li>Flow: Save → <code>SaveSearchForm</code> → <code>SaveToWatchlist.save</code> → <code>handleSave</code> → <code>fetch POST</code> → <code>route.ts</code> → Zod → Prisma → Neon → 201 → <code>setMessage</code> → <code>focusAfterSave</code> → <code>fetchSearches</code> → <code>setSearches</code> → redraw → <code>useEffect</code> focus</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li><code>handleSave</code> posts the card's pair, then refreshes the list; we get the "Saved." announcement, and focus goes to the new card once it's drawn.</li>
+      <li>The functionality was tested at <code>localhost:3000</code>, and all the checks passed.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 38 · #8 Navigator handleSave</b>
+    <ul>
+      <li>What it is: the piece that connects the result card's form to the D1 route</li>
+      <li>Why: the new card is not on the page until the list redraws, so the id waits in a ref and a <code>useEffect</code> on <code>searches</code> does the focus; <code>result</code> is used instead of <code>lastSearch</code> because <code>lastSearch</code> changes as soon as a new search starts</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: <code>handleSave</code>, <code>focusAfterSave</code>, focus effect</li>
+        </ul>
+      </li>
+      <li>Its role in the project: #8's behavior is complete; D4 runs the acceptance checks and closes the issue</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 38 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Save click]:::run
+  SF[components/SaveSearchForm.tsx<br/>onSubmit]:::ui
+  SW[components/ResultCard.tsx<br/>SaveToWatchlist save]:::ui
+  NAV[components/Navigator.tsx<br/>handleSave]:::ui
+  RT[app/api/searches/route.ts<br/>POST]:::server
+  NE[Neon dev<br/>SavedSearch]:::db
+  SL[components/SavedList.tsx<br/>new card first]:::ui
+  BR --> SF
+  SF -->|onSubmit up| SW
+  SW -->|onSave up| NAV
+  NAV -->|fetch POST result pair| RT
+  RT --> NE
+  RT -->|201 search| NAV
+  NAV -->|fetch GET, setSearches| SL
+  NAV -->|useEffect focus heading| SL
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
