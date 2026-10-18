@@ -1,4 +1,4 @@
 stage: D
-step: D3 (3 of 6)
+step: D4 (4 of 6)
 issue: #6
-title: LicensePicker
+title: ResultCard

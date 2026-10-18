@@ -24,7 +24,7 @@ The app asks TDLR for counts and nothing else. It never fetches or shows names, 
 | C · Read, delete, edit | #3 | See my saved searches | ✅ |
 | | #4 | Delete a saved search | ✅ |
 | | #5 | Edit a saved search's label and note | ✅ |
-| D · Search and save | #6 | Search a license count | ⬜ |
+| D · Search and save | #6 | Search a license count | 🔄 in progress (count route done) |
 | | #7 | Live license types from TDLR | ⬜ |
 | | #8 | Save a search to the watchlist | ⬜ |
 | E · Counts and done check | #9 | Live counts on saved cards | ✂️ cut |

@@ -2731,7 +2731,7 @@ sequenceDiagram
       <li>Not on the page yet; <code>Navigator</code> renders it in D5</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: LicensePicker form with the HVAC types and 13 counties; prompt log entry 32</td></tr>
+  <tr><td><b>Commit</b></td><td><code>afdefed</code> feat: LicensePicker form with the HVAC types and 13 counties; prompt log entry 32</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the search form exists, ready for <code>Navigator</code> to show [S2]</li>

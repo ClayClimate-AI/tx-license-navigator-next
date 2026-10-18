@@ -37,6 +37,13 @@ Decided by Joseph, Sat Oct 17 ~13:45 CT.
 - **No early test deploy:** Joseph works one issue at a time, in order, to keep a clear picture of how the pieces connect.
 - **Lighter recaps from #5 on:** full recap and flow map for new patterns (#6, #8, #11), short ones for repeats (#5, #7, #10). Diff, accept, test, commit and push, and the prompt log stay the same for every step.
 
+## Status · Sun Oct 18 (~00:50 CT, end of Saturday's session)
+
+- **Saturday's plan slipped.** #5 closed (Actual 2 h). #6 started Sat ~21:40 CT and is at D4 of 6: D1 `lib/tdlr.ts`, D2 `GET /api/count`, D3 `LicensePicker` are committed and pushed (`afdefed`). D4 `ResultCard`, D5 wire up in `Navigator`, D6 checks and close are left.
+- **#7 moves after #11**, by the Saturday rule "if #6 runs long". Order now: #6 → #8 → #10 → #11 → #7. #7 is built only if time is left before the demo; if not, it is closed with cut 2.
+- **Build work now runs into Sunday and Monday morning.** Left, by the issue estimates: #6 ~1 h, #8 1.5 h, #10 1.5 h, #11 1.5 h, Monday demo prep ~1 h (≈ 6.5 h), plus #7 1 h if kept. At this week's pace, expect about 1.3× that.
+- **Open, for Joseph:** how many hours Sunday allows around school work, and the demo time on Monday. Those decide whether #7 is built or cut.
+
 ## Why the build ran over time and tokens
 
 Estimates against actuals, closed issues (wall clock from `Started`, includes breaks and overnight gaps):
