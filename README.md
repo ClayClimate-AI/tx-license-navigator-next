@@ -88,6 +88,15 @@ Saved searches go through Prisma to Neon. Counts go through `lib/tdlr.ts` to TDL
 | `npm run build` | `prisma generate`, then `next build` (the same build Netlify runs) |
 | `npm run lint` | ESLint |
 
+## API routes
+
+| Route | Returns |
+|---|---|
+| `GET /api/count?type=&county=` | `{ count, queryUrl }` from TDLR · 400 bad query · 502 TDLR error · 504 after 8 s |
+| `GET /api/searches` | saved searches, newest first |
+| `PATCH /api/searches/[id]` | updates label and note |
+| `DELETE /api/searches/[id]` | removes one saved search |
+
 ## Project layout
 
 ```

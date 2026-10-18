@@ -2515,3 +2515,190 @@ flowchart TD
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef css fill:#c2410c,color:#fff,stroke:#fdba74
 ```
+
+## Entry 30 · #6 lib/tdlr.ts count fetcher
+
+*Oct 17 · ~21:40 to 22:10 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Work issue #6. Step D1 only: port the count half of Week 4's <code>src/api/tdlr.js</code> to a server-only <code>lib/tdlr.ts</code> with an 8 second timeout</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #6 ACs; <code>docs/spec/requirements.md</code> S2–S7, P1; <code>docs/spec/design.md</code> API contracts (count), <code>lib/tdlr.ts</code> notes</li>
+      <li>Week 4 <code>src/api/tdlr.js</code>, read with <code>gh api</code> from <code>ClayClimate-AI/tx-license-navigator</code> (read only)</li>
+      <li><code>lib/validation.ts</code> (<code>countQuery</code> already there), <code>lib/counties.ts</code>, <code>lib/db.ts</code> (the <code>server-only</code> pattern)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file new
+    <ul>
+      <li>🟫 <code>lib/tdlr.ts</code> (new) · <code>TdlrError</code> (<code>status</code>, <code>timedOut</code>) · <code>buildCountUrl(type, county, breakColumn)</code> (SoQL with only <code>license_type</code>, <code>business_county</code>, <code>count(*)</code>) · <code>fetchHolderCount</code> with <code>cache: "no-store"</code> and <code>AbortSignal.timeout(8000)</code></li>
+      <li>Changed from Week 4: <code>import "server-only"</code>; <code>breakColumn</code> is a parameter instead of reading <code>window.location</code>; no <code>toUpperCase</code> (Zod already checks the ALL CAPS value); the license-type list waits for #7</li>
+      <li>Added: <code>docs/assets/reference/week5_issue6_d1_fetch-holder-count-flow.png</code> (Joseph's diagram)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh issue comment 6</code>: <code>Started</code> posted 2026-10-18T02:40:39Z</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>Called for real through the route in Entry 31</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending · Joseph commits</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the server can ask TDLR for a holder count, and the browser never calls TDLR [P1]</li>
+      <li>Input: <code>type</code>, <code>county</code> (ALL CAPS value), optional <code>breakColumn</code></li>
+      <li>Output: a number (0 is the empty state), or a thrown <code>TdlrError</code> with TDLR's code, or <code>null</code> plus <code>timedOut</code> for a timeout or no connection</li>
+      <li>Flow: <code>fetchHolderCount</code> → <code>buildCountUrl</code> → <code>fetch</code> (no-store, 8 s) → TDLR API → <code>rows[0].holders</code> → <code>Number</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>One reflection covers D1 and D2; see Entry 31.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 30 · #6 lib/tdlr.ts count fetcher</b>
+    <ul>
+      <li>What it is: the server's only door to TDLR, ported from Week 4</li>
+      <li>Why: Week 5 moves TDLR behind our server; <code>server-only</code> makes the build fail if a browser file imports it</li>
+      <li>Files:
+        <ul>
+          <li><code>lib/tdlr.ts</code>: <code>TdlrError</code>, <code>buildCountUrl</code>, <code>fetchHolderCount</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: finds the problem (no answer, bad code, not a number); the route decides the status code</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 30 call graph
+
+```mermaid
+flowchart TD
+  FH[lib/tdlr.ts<br/>fetchHolderCount]:::tdlr
+  BU[lib/tdlr.ts<br/>buildCountUrl]:::tdlr
+  API[TDLR API<br/>data.texas.gov 7358-krk7]:::run
+  NUM[number<br/>0 = empty]:::tdlr
+  ERR[TdlrError<br/>status or null, timedOut]:::tdlr
+  FH --> BU
+  BU -->|SoQL URL| API
+  API -->|200 rows| NUM
+  API -->|not ok| ERR
+  API -->|no answer in 8 s| ERR
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 31 · #6 GET /api/count
+
+*Oct 17 · ~22:25 to 23:58 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go D2: <code>GET /api/count</code> checks the query with Zod, calls <code>fetchHolderCount</code>, and answers 200, 400, 502, or 504; add the route to the README</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/design.md</code> API contracts (count row, error body shape)</li>
+      <li><code>app/api/searches/route.ts</code> (the route pattern), <code>lib/validation.ts</code>, <code>lib/tdlr.ts</code>, <code>README.md</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file new, 1 modified
+    <ul>
+      <li>🟥 <code>app/api/count/route.ts</code> (new) · <code>GET</code>: <code>countQuery.safeParse(Object.fromEntries(request.nextUrl.searchParams))</code> (400) → <code>fetchHolderCount</code> → <code>200 { count, queryUrl }</code>; <code>TdlrError</code> with <code>timedOut</code> → <code>504</code>; any other failure → <code>502</code>; both carry <code>status</code></li>
+      <li><code>README.md</code> (modified) · new "API routes" section</li>
+      <li>Added: <code>docs/assets/reference/week5_issue6_d2_count-route-flow-map.png</code> (the flow map)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>curl</code> A/C Technician + <code>HARRIS</code>: <code>{"count":12095,"queryUrl":…}</code>, the Week 4 number</li>
+      <li><code>curl</code> A/C Technician + <code>LOVING</code>: <code>{"count":0,…}</code></li>
+      <li><code>curl</code> county <code>NOWHERE</code>: <code>HTTP 400</code> "Choose a license type and one of the listed counties."</li>
+      <li><code>curl</code> <code>HARRIS&amp;break=column</code>: <code>HTTP 502</code> <code>{"error":"We could not reach the Texas data service.","status":400}</code></li>
+      <li>504 timeout not yet checked (planned for D6)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending · Joseph commits</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the page can get a TDLR count from our server, and the browser never calls TDLR [S3, S6, S7, P1]</li>
+      <li>Input: query <code>type</code>, <code>county</code>, optional <code>break=column</code></li>
+      <li>Output: <code>200 { count, queryUrl }</code> · <code>400 { error }</code> · <code>502</code> / <code>504 { error, status }</code></li>
+      <li>Flow: <code>curl</code> or browser <code>fetch</code> → <code>app/api/count/route.ts</code> → Zod <code>countQuery</code> → <code>fetchHolderCount</code> → TDLR API → JSON</li>
+      <li>New wording not in <code>design.md</code>: 400 "Choose a license type and one of the listed counties."; 502/504 "We could not reach the Texas data service." (the Week 4 error card heading)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>The browser (or <code>curl</code> for now) sends <code>GET /api/count?type=A/C Technician&amp;county=HARRIS</code>; the <code>?</code> separates the address from the query string. Next.js matches the folder path and runs <code>GET</code> in <code>route.ts</code>, which returns a <code>Promise&lt;Response&gt;</code>.</li>
+      <li>It reads the query from <code>request.nextUrl.searchParams</code> and checks it with <code>countQuery.safeParse</code>; any broken rule (like county <code>NOWHERE</code>) is a 400 and stops there.</li>
+      <li><code>breakColumn</code> is false unless <code>?break=column</code> is in the URL, which misspells the column on purpose so TDLR fails and the error state can be demoed.</li>
+      <li>Then <code>fetchHolderCount</code> in <code>tdlr.ts</code> runs: <code>buildCountUrl</code> turns the values into SoQL, <code>fetch</code> asks TDLR (an outside data service, not our database) with no caching and an 8 second timer. No answer throws <code>TdlrError</code> with status null; not ok throws <code>TdlrError</code> with TDLR's code; ok gives rows, and <code>Number</code> turns "12095" into 12095.</li>
+      <li>Back in the route: a timeout is HTTP 504, any other TDLR failure is HTTP 502 with TDLR's code (400 for break) inside the body, and success is 200 <code>{ count, queryUrl }</code>, where <code>queryUrl</code> is the address for the "See the exact data request" link.</li>
+      <li>The number goes up from <code>tdlr.ts</code> to the route to the caller; in D5 the browser will use it to show the result card.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 31 · #6 GET /api/count</b>
+    <ul>
+      <li>What it is: the server door the search form will call</li>
+      <li>Why: the browser must not reach TDLR directly; the route checks the question first and turns <code>tdlr.ts</code> errors into status codes</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/count/route.ts</code>: <code>GET</code></li>
+          <li><code>README.md</code>: API routes section</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the server half of search; <code>LicensePicker</code>, <code>ResultCard</code>, and <code>Navigator</code> use it in D3 to D5, and saved cards reuse it in #10</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 31 call graph
+
+```mermaid
+flowchart TD
+  CL[curl / Browser<br/>GET /api/count?type=&county=]:::run
+  RT[app/api/count/route.ts<br/>GET]:::server
+  ZQ[lib/validation.ts<br/>countQuery]:::server
+  FH[lib/tdlr.ts<br/>fetchHolderCount]:::tdlr
+  API[TDLR API<br/>data.texas.gov]:::run
+  R200[200 count, queryUrl]:::server
+  R400[400 bad query]:::server
+  R502[502 TDLR error + status]:::server
+  R504[504 timed out]:::server
+  CL --> RT
+  RT --> ZQ
+  ZQ -->|fail| R400
+  ZQ -->|ok| FH
+  FH --> API
+  FH -->|number| R200
+  FH -->|TdlrError| R502
+  FH -->|timedOut| R504
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+### Entry 31 async sequence
+
+```mermaid
+sequenceDiagram
+  participant C as curl / Browser
+  participant R as route.ts GET
+  participant Z as Zod countQuery
+  participant T as tdlr.ts fetchHolderCount
+  participant A as TDLR API
+  C->>R: GET /api/count?type=A/C Technician&county=HARRIS
+  R->>Z: safeParse(query)
+  Z-->>R: ok (or 400)
+  R->>T: await fetchHolderCount(type, county, false)
+  T->>A: fetch SoQL URL, 8 s timer
+  A-->>T: [{ holders: "12095" }] (or error, or no answer)
+  T-->>R: 12095 (or throw TdlrError)
+  R-->>C: 200 { count, queryUrl } (or 502 / 504)
+```
