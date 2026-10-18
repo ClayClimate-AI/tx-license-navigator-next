@@ -1,4 +1,4 @@
 stage: D
-step: D5 (5 of 6)
+step: D6 (6 of 6)
 issue: #6
-title: Wire search into Navigator
+title: Acceptance checks and close

@@ -2892,7 +2892,7 @@ flowchart TD
       <li>Joseph, browser: Harris shows the count; Loving shows the empty card; no county shows "Choose a county."; <code>/?break=column</code> shows "Something went wrong (error 400). Your choices are saved." and the pink card with "(error 400)" and Try again (screenshot); saved cards still work</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: search wired into Navigator with status line and focus; prompt log entry 34</td></tr>
+  <tr><td><b>Commit</b></td><td><code>6aa0e54</code> feat: search wired into Navigator with status line and focus; prompt log entry 34</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: a visitor can search and see the TDLR count on the page [S3–S7]</li>
@@ -2964,4 +2964,89 @@ sequenceDiagram
   R-->>N: 200 { count, queryUrl }
   N->>N: setResult, setStatus("success"), setMessage("Done…")
   N->>B: React redraws, then useEffect focuses #result-heading
+```
+
+## Entry 35 · #6 Close-out checks
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>go: step D6, the 504 timeout check, the 7 acceptance criteria, and closing #6</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #6 ACs; <code>docs/agents/issue-tracker.md</code> (Actual); closed issue #5 (body pattern)</li>
+      <li><code>lib/tdlr.ts</code>, <code>app/api/count/route.ts</code>, <code>README.md</code> Status</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified, 1 issue edited
+    <ul>
+      <li><code>README.md</code> (modified) · Status: #6 ✅</li>
+      <li>Issue #6 body: all 7 boxes ticked, <code>Actual: 12.5 h (wall clock, includes breaks)</code></li>
+      <li><code>lib/tdlr.ts</code> <code>TIMEOUT_MS</code> set to 1 for the test, then back to 8000 (no net change)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>TIMEOUT_MS = 1</code>: <code>curl</code> Harris → <code>HTTP 504</code> <code>{"error":"We could not reach the Texas data service.","status":null}</code></li>
+      <li>Back to <code>8000</code> (<code>grep</code> line 7): <code>curl</code> Harris → <code>HTTP 200</code> <code>count 12095</code></li>
+      <li><code>grep -rnF '$select' '$where' '$group' lib app</code>: only <code>lib/tdlr.ts</code> lines 36–37, <code>count(*)</code>, <code>license_type</code>, <code>business_county</code> [P1]</li>
+      <li>Earlier evidence: Harris 12,095, Loving 0, <code>NOWHERE</code> 400 (Entry 31); browser checks and the <code>break=column</code> screenshot (Entry 34)</li>
+      <li><code>gh issue edit 6</code>: boxes ticked, Actual 12.5 h (Started 02:40:39Z, now 15:07:38Z)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> docs: #6 checks pass; README status; prompt log entry 35. Closes #6</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: prove every #6 acceptance criterion and close the issue</li>
+      <li>Input: the running app, <code>curl</code>, a temporary 1 ms timeout, the issue body</li>
+      <li>Output: 7 of 7 criteria with evidence; issue body and README updated</li>
+      <li>Flow: 1 ms timeout → <code>curl</code> 504 → restore 8000 → <code>curl</code> 200 → <code>grep</code> SoQL → tick the issue → README → log</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This main section was about using the API endpoint to bring live data into the application, and making sure the proper testing was done to see how the app responds in different scenarios, so the implementation handles each response.</li>
+      <li>A lot of it made more sense because it picked up from the Week 4 project. The flow diagrams, diving in, and asking questions about the functionality really helped.</li>
+      <li>It also showed me that you don't just trust the code you're handed to perform the way you want. You have to think about edge cases and possible failure points, which I didn't know to try by default. Going through this showed me ways to evaluate the behavior and to tackle everything incrementally, instead of giving AI one instruction and having it do it all at once.</li>
+      <li>There's still a lot to learn, and even with the extension, after three or four days there's more to really learn. The most useful part of this project is that we took the time to understand the data flow, the database, and the internal underpinnings, and after that things made a lot more sense.</li>
+      <li>I missed the time estimates, but I believe getting familiar with working in the IDE and the CLI, checking diffs, leaning into the controlled loop, and asking a lot of clarifying questions means each build after this will get better.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 35 · #6 Close-out checks</b>
+    <ul>
+      <li>What it is: the evidence pass that closes #6</li>
+      <li>Why: the 504 cannot be seen without forcing a timeout; a 1 ms limit makes TDLR "too slow" on purpose, then the real 8 s limit goes back</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: Status</li>
+        </ul>
+      </li>
+      <li>Its role in the project: search is done; #8 saves <code>lastSearch</code> to the watchlist next</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 35 call graph
+
+```mermaid
+flowchart TD
+  CL[curl<br/>GET /api/count Harris]:::run
+  RT[app/api/count/route.ts<br/>GET]:::server
+  FH[lib/tdlr.ts<br/>TIMEOUT_MS 1, then 8000]:::tdlr
+  API[TDLR API]:::run
+  R504[504 status null]:::server
+  R200[200 count 12095]:::server
+  CL --> RT
+  RT --> FH
+  FH --> API
+  FH -->|1 ms: TimeoutError| R504
+  FH -->|8000 ms: answered| R200
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```
