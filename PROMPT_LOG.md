@@ -2998,7 +2998,7 @@ sequenceDiagram
       <li><code>gh issue edit 6</code>: boxes ticked, Actual 12.5 h (Started 02:40:39Z, now 15:07:38Z)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>(hash)</code> docs: #6 checks pass; README status; prompt log entry 35. Closes #6</td></tr>
+  <tr><td><b>Commit</b></td><td><code>c8cc8d1</code> docs: #6 checks pass; README status; prompt log entry 35. Closes #6</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: prove every #6 acceptance criterion and close the issue</li>
@@ -3049,4 +3049,94 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 36 · #8 POST /api/searches
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>work issue #8; step D1, the <code>POST /api/searches</code> route</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #8 ACs; <code>docs/spec/requirements.md</code> C1–C4, A1, A2; <code>docs/spec/design.md</code> Validation, API contracts, Flows: Save</li>
+      <li><code>app/api/searches/route.ts</code>, <code>app/api/searches/[id]/route.ts</code> (PATCH pattern), <code>lib/validation.ts</code> (<code>createBody</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 files modified
+    <ul>
+      <li>🟥 <code>app/api/searches/route.ts</code> (modified) · <code>POST</code>: <code>request.json()</code> → <code>createBody.safeParse</code> → <code>prisma.savedSearch.create</code> → 201 <code>{ search }</code>; 400 bad body, 409 on <code>P2002</code>, 500 otherwise</li>
+      <li><code>README.md</code> (modified) · routes table row for <code>POST /api/searches</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>curl</code> POST A/C Technician · HARRIS → <code>409</code> "You already saved this search." (row id 1 from #5 already held that pair)</li>
+      <li><code>curl</code> POST A/C Technician · DALLAS → <code>201</code> <code>{"search":{"id":5,…,"note":null}}</code></li>
+      <li>Same DALLAS POST again → <code>409</code> "You already saved this search." [C4]</li>
+      <li>DALLAS with <code>"label":""</code> → <code>400</code> "Check the label and note, then try again." (400, not 409: Zod runs before the database)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the server can save a search, the "C" in CRUD</li>
+      <li>Input: JSON body <code>{ licenseType, county, label, note? }</code></li>
+      <li>Output: 201 <code>{ search }</code> and a new Neon row · 400 · 409 · 500 with <code>{ error }</code></li>
+      <li>Flow: <code>curl</code> / <code>fetch</code> → <code>route.ts POST</code> → <code>request.json()</code> → Zod <code>createBody</code> → <code>prisma.savedSearch.create</code> → Neon <code>@@unique</code> → JSON</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>In this step we built save, also known as posting: the <code>POST</code> function in <code>/api/searches</code> takes a search, checks it, and stores it in Neon.</li>
+      <li>The order is inside the route. First it reads the body; if it isn't JSON, the route answers 400, so nothing reaches the database.</li>
+      <li>If it's good to go, Zod checks it: an empty label, a label over 80 characters, a bad county, or any extra key gets a 400.</li>
+      <li>Then Prisma creates the row, and a new pair gets a 201 with the saved search. Neon's unique rule refuses a type and county that are already saved, and the route answers 409 "You already saved this search." Anything else gets a 500, "We could not reach the saved searches database."</li>
+      <li>We used a few commands to prove the sequence works: we ran Dallas and got a 201, ran Dallas again and got a 409, and sent an empty label and got a 400. The 400 came before the 409 because Zod runs before the database.</li>
+      <li>To sum it up: Zod guards the door, Prisma writes the row, and Neon's unique rule stops duplicates.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 36 · #8 POST /api/searches</b>
+    <ul>
+      <li>What it is: the server half of save; it sits next to <code>GET</code> in the same <code>route.ts</code></li>
+      <li>Why: design.md API contracts lists <code>POST /api/searches</code> with 201, 400, 409 (<code>P2002</code>), 500; the duplicate check lives in the database (<code>@@unique</code>), not in app code, so two quick saves cannot both get through</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/searches/route.ts</code>: <code>POST</code> handler</li>
+          <li><code>README.md</code>: routes table</li>
+        </ul>
+      </li>
+      <li>Its role in the project: D2 adds the Save button and form in <code>ResultCard</code>; D3 has <code>Navigator</code> call this route</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 36 call graph
+
+```mermaid
+flowchart TD
+  CL[curl<br/>POST /api/searches]:::run
+  RT[app/api/searches/route.ts<br/>POST]:::server
+  ZD[lib/validation.ts<br/>createBody.safeParse]:::server
+  DB[lib/db.ts<br/>prisma.savedSearch.create]:::db
+  NE[Neon dev<br/>SavedSearch @@unique]:::db
+  R400[400 check the label and note]:::server
+  R201[201 search]:::server
+  R409[409 already saved]:::server
+  CL --> RT
+  RT --> ZD
+  ZD -->|fails| R400
+  ZD -->|ok| DB
+  DB --> NE
+  NE -->|new row| R201
+  NE -->|P2002| R409
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
