@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { COUNTIES } from "@/lib/counties";
+import { countyLabel } from "@/lib/counties";
 import SaveSearchForm from "./SaveSearchForm";
 
 // One row from GET /api/searches, as the browser receives it (JSON, so dates are strings).
@@ -11,11 +11,6 @@ export type SavedSearch = {
   note: string | null;
   createdAt: string;
 };
-
-// "FORT BEND" → "Fort Bend". Falls back to the stored value if it is not one of the 13.
-function countyLabel(value: string) {
-  return COUNTIES.find((c) => c.value === value)?.label ?? value;
-}
 
 type Mode = "view" | "editing" | "confirmingDelete";
 

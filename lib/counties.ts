@@ -22,3 +22,8 @@ export type CountyValue = (typeof COUNTIES)[number]["value"];
 
 // The 13 values on their own, for z.enum. Built from COUNTIES so the list is written once.
 export const COUNTY_VALUES = COUNTIES.map((c) => c.value);
+
+// "FORT BEND" → "Fort Bend". Falls back to the stored value if it is not one of the 13.
+export function countyLabel(value: string) {
+  return COUNTIES.find((c) => c.value === value)?.label ?? value;
+}

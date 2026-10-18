@@ -2779,3 +2779,86 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```
+
+## Entry 33 · #6 ResultCard
+
+*Oct 18 · CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>lets work: step D4, port Week 4's <code>ResultCard.jsx</code> with the five result states</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Week 4 <code>src/components/ResultCard.jsx</code>, read with <code>gh api</code> (read only)</li>
+      <li><code>SOT_documents/UI.md</code> Part 1 (Result card states, Accessibility); <code>components/SavedCard.tsx</code> (<code>countyLabel</code>); <code>components/SavedList.tsx</code> (Try again style, heading focus by id)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file new, 2 modified
+    <ul>
+      <li>🟩 <code>components/ResultCard.tsx</code> (new) · exports <code>ResultStatus</code>; panels idle, loading, success, empty, error; <code>RequestDetails</code> link; finished headings <code>id="result-heading"</code> with <code>tabIndex={-1}</code></li>
+      <li>🟩 <code>lib/counties.ts</code> (modified) · <code>countyLabel</code> moved here and exported</li>
+      <li>🟩 <code>components/SavedCard.tsx</code> (modified) · imports <code>countyLabel</code> instead of its own copy</li>
+      <li>Changed from Week 4: no <code>headingRef</code> prop (focus by id, like <code>saved-heading</code>); county arrives ALL CAPS and shows through <code>countyLabel</code>; project Try again style; ring from <code>globals.css</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>curl</code> <code>http://localhost:3000/</code>: <code>200</code> after the <code>countyLabel</code> move</li>
+      <li>Not on the page yet; <code>Navigator</code> renders it in D5</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>(hash)</code> feat: ResultCard with the five Week 4 result states; shared countyLabel; prompt log entry 33</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the answer box exists, ready to show any search outcome [S4, S5, S6]</li>
+      <li>Input: props <code>status</code>, <code>type</code>, <code>county</code>, <code>count</code>, <code>queryUrl</code>, <code>errorCode</code>, <code>onRetry</code></li>
+      <li>Output: one of five panels; Try again calls <code>onRetry()</code> up</li>
+      <li>Flow: <code>Navigator</code> state → props → <code>ResultCard</code> picks a panel from <code>status</code> → render; Try again → <code>onRetry()</code> → <code>Navigator</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>
+    <ul>
+      <li>This step is about <code>ResultCard</code> and the different responses it can show. Depending on what comes back, there is a matching result status, and the card shows the panel for that status.</li>
+      <li>It is one part of the page: the part that shows what came back from the fetch, so the visitor can see what happened on the back end.</li>
+      <li><code>Navigator</code> decides what happened; the card just picks one of the five panels to show it.</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 33 · #6 ResultCard</b>
+    <ul>
+      <li>What it is: the Week 4 result region as a props-only component with five states</li>
+      <li>Why: empty is an answer, not a failure, and the error state needs its code and Try again [S4, S6]; the finished heading takes focus after a search [A2]</li>
+      <li>Files:
+        <ul>
+          <li><code>components/ResultCard.tsx</code>: <code>ResultCard</code>, <code>RequestDetails</code></li>
+          <li><code>lib/counties.ts</code>: shared <code>countyLabel</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: the "answer" half of search in the browser; <code>Navigator</code> fills it in D5</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 33 call graph
+
+```mermaid
+flowchart TD
+  NAV[components/Navigator.tsx<br/>owns the result state<br/>wired in D5]:::ui
+  RC[components/ResultCard.tsx<br/>picks one of five panels]:::ui
+  CL[lib/counties.ts<br/>countyLabel]:::ui
+  SC[components/SavedCard.tsx]:::ui
+  RD[RequestDetails<br/>See the exact data request]:::ui
+  API[TDLR API<br/>queryUrl opened by the visitor]:::run
+  NAV -->|props down| RC
+  CL --> RC
+  CL --> SC
+  RC --> RD
+  RD --> API
+  RC -->|onRetry up| NAV
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
