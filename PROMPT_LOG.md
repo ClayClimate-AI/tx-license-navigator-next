@@ -3975,7 +3975,7 @@ flowchart TD
       <li>Fix: focus ref (G4a), empty-state wording (G4b), #7 checkboxes (G5). Skip: <code>idParam</code> leniency, refactors, P3/P4/P6/P8–P11</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>01691d9</code> pushed to main (<code>823d5a3..01691d9</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: checks the code itself against the rules and the spec, to find what click tests can't</li>
@@ -4046,7 +4046,7 @@ flowchart TD
       <li>The failure path (Neon fails between POST and refetch) has no reliable click test; checked by reading the code</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>01691d9</code> pushed to main (<code>823d5a3..01691d9</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: if the list fails to reload right after a save, focus does not jump to that card later during an unrelated edit, delete or Try again</li>
@@ -4089,4 +4089,80 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+```
+
+## Entry 49 · #10 Empty-state wording for all license types
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"go": step G4b, fix G3 finding P5 (empty state says "the other license type")</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>components/ResultCard.tsx</code> empty state</li>
+      <li><code>SOT_documents/UI.md</code> Week 4 result card table and the "Week 5 wording" line from #7</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 files modified
+    <ul>
+      <li>🟩 <code>components/ResultCard.tsx</code> (modified) · "the other license type" → "another license type"</li>
+      <li><code>SOT_documents/UI.md</code> (modified) · Week 5 wording line gains the new empty-state sentence; the Week 4 table stays as the record</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>grep</code> before the edit: "the other license type" only at <code>ResultCard.tsx:68</code> and the Week 4 table in <code>UI.md:44</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the empty result no longer suggests there are only two license types; #7 offers 50</li>
+      <li>Input: none new; shows when TDLR returns a count of 0</li>
+      <li>Output: the yellow empty box's last line reads "Try a nearby county or another license type."</li>
+      <li>Flow: Search → <code>/api/count</code> → <code>count: 0</code> → <code>ResultCard</code> empty state</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>The purpose of this: the empty result no longer suggests there are only two license types. #7 offers 50, so we've expanded the list, and users are no longer going to be limited to HVAC-only categories.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 49 · #10 Empty-state wording for all license types</b>
+    <ul>
+      <li>What it is: a one-sentence wording fix</li>
+      <li>Why: G3 finding P5, Week 4 wording left over after #7</li>
+      <li>Files:
+        <ul>
+          <li><code>components/ResultCard.tsx</code>: empty state</li>
+          <li><code>SOT_documents/UI.md</code>: Week 5 wording line</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the page wording matches the 50-type list everywhere</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 49 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Search]:::run
+  NV[components/Navigator.tsx<br/>runSearch]:::ui
+  RT[app/api/count/route.ts<br/>GET]:::server
+  TD[lib/tdlr.ts<br/>fetchHolderCount]:::tdlr
+  API[TDLR API]:::run
+  RC[components/ResultCard.tsx<br/>empty state]:::ui
+  BR --> NV
+  NV -->|fetch /api/count| RT
+  RT --> TD
+  TD --> API
+  API -->|count 0| TD
+  RT -->|count 0| NV
+  NV --> RC
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```

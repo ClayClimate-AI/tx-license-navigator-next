@@ -29,7 +29,7 @@ This file is context only. Part 1 is facts about how Week 4 looked, taken from t
 - License type list had two groups: "HVAC" and "All other license types". While loading it said "Loading license types…".
 - County error text in red `#A3243B`: "There is a problem: …"
 - Button: navy `#14304F`, white bold text, hover `#0E2238`. Says "Show license count", or "Checking…" while busy.
-- Week 5 wording (#7, all license types): subtitle "License demand by Texas county"; h1 "Look up license demand by county"; intro "See how many people hold a Texas license, such as HVAC or electrician, in a county. Use it to judge local demand before you train or apply."; license type hint "HVAC types are listed first. For HVAC, technicians work for a company and contractors run the business."
+- Week 5 wording (#7, all license types): subtitle "License demand by Texas county"; h1 "Look up license demand by county"; intro "See how many people hold a Texas license, such as HVAC or electrician, in a county. Use it to judge local demand before you train or apply."; license type hint "HVAC types are listed first. For HVAC, technicians work for a company and contractors run the business."; empty result last line "Try a nearby county or another license type." (#10)
 - Outline button (Week 5, saved cards: Delete, Keep): white, navy `#14304F` border and bold text, hover light navy tint `#EEF2F6`. The confirmed Delete uses the red Try again style (`#A3243B`, hover `#82192D`).
 
 ### Status line

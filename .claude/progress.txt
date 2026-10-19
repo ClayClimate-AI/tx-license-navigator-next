@@ -1,4 +1,4 @@
 stage: G
-step: G4a (4 of 5) done, G4b next
+step: G4b (4 of 5) done, G4c next
 issue: #10
 title: Done check

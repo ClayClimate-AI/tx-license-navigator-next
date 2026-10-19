@@ -65,7 +65,7 @@ export default function ResultCard({ status, type, county, count, queryUrl, erro
         <p className="mt-1 text-[15px] text-[#4A5A6A]">
           TDLR lists no {type} licenses with {place} as the business county.
         </p>
-        <p className="text-[15px] text-[#4A5A6A]">Try a nearby county or the other license type.</p>
+        <p className="text-[15px] text-[#4A5A6A]">Try a nearby county or another license type.</p>
         <SaveToWatchlist initialLabel={label} onSave={onSave} />
         <RequestDetails queryUrl={queryUrl} />
       </section>
