@@ -3570,7 +3570,7 @@ flowchart TD
       <li>Joseph saw the h1, intro, header subtitle and type hint still say HVAC; fix is step F3b</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>01ca448</code> feat: live license type list with HVAC pinned first; prompt log entry 42</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the visitor can search any of the top 50 license types, not just the two HVAC ones [S1]</li>
@@ -3615,4 +3615,75 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 43 · #7 Page wording for all license types
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Joseph, after F3: "the page literally says look up HVAC license by demand, but we're not just looking up HVAC license". Step F3b only: drop "HVAC" from the header subtitle, h1, intro and type hint. He also asked whether HVAC and the heading should be lowercase</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>grep -rn -i hvac app components</code>: subtitle in <code>SiteHeader.tsx</code>, h1 and intro in <code>app/page.tsx</code>, hint in <code>LicensePicker.tsx</code></li>
+      <li><code>SOT_documents/UI.md</code> Part 1 lines 15, 19, 27 (the Week 4 wording); <code>app/layout.tsx</code> metadata already general</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    3 files modified, 1 doc modified
+    <ul>
+      <li>🟩 <code>components/SiteHeader.tsx</code> (modified) · subtitle "License demand by Texas county"</li>
+      <li>🟦 <code>app/page.tsx</code> (modified) · h1 "Look up license demand by county"; intro "See how many people hold a Texas license, such as HVAC or electrician, in a county. …"</li>
+      <li>🟩 <code>components/LicensePicker.tsx</code> (modified) · hint "HVAC types are listed first. For HVAC, technicians work for a company and contractors run the business."</li>
+      <li><code>SOT_documents/UI.md</code> (modified) · added a "Week 5 wording (#7)" line; Part 1's Week 4 facts left as they were</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted · headings stay in sentence case (Week 4 style, plain government style); HVAC stays in capitals (an acronym)</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>curl -s localhost:3000 | grep</code>: all four new lines in the page HTML</li>
+      <li><code>grep -rn -i "hvac license" app components README.md</code>: no matches</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the page says it covers any common Texas license, matching the select from F3</li>
+      <li>Input: none (text only)</li>
+      <li>Output: new subtitle, h1, intro and type hint</li>
+      <li>Flow: <code>app/page.tsx</code> → <code>SiteHeader</code> → h1 and intro → <code>Navigator</code> → <code>LicensePicker</code> hint</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>This was a small, text-only change; it doesn't change behavior. What it does is point the visitor in the right direction from the first line: the app covers any common license, with HVAC pinned first. At first the app looked like it was centered around just HVAC, but we want it to be all-inclusive, so anyone in any trade can use it. So we changed the wording.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 43 · #7 Page wording for all license types</b>
+    <ul>
+      <li>What it is: four lines of page text</li>
+      <li>Why: after F3 the page offered 50 types, but its headings still said HVAC</li>
+      <li>Files:
+        <ul>
+          <li><code>components/SiteHeader.tsx</code>, <code>app/page.tsx</code>, <code>components/LicensePicker.tsx</code>: the text</li>
+          <li><code>SOT_documents/UI.md</code>: records the new wording</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the spec and the page say the same thing</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 43 call graph
+
+```mermaid
+flowchart TD
+  PG[app/page.tsx<br/>h1 and intro]:::entry
+  SH[components/SiteHeader.tsx<br/>subtitle]:::ui
+  NV[components/Navigator.tsx]:::ui
+  LP[components/LicensePicker.tsx<br/>type hint]:::ui
+  PG --> SH
+  PG --> NV
+  NV --> LP
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
 ```

@@ -10,7 +10,7 @@ export default function SiteHeader() {
           <p className="text-[22px] font-bold leading-tight text-white">
             Second Chance License Navigator
           </p>
-          <p className="text-[14px] text-[#CFE0F2]">HVAC license demand by Texas county</p>
+          <p className="text-[14px] text-[#CFE0F2]">License demand by Texas county</p>
         </div>
       </div>
       <div className="h-1 bg-[#A3243B]" />

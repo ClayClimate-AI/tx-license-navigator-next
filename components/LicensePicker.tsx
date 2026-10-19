@@ -38,7 +38,7 @@ export default function LicensePicker({ types, typesLoading, type, county, onTyp
           <div className="flex flex-col">
             <label htmlFor="license-type" className="block text-[15px] font-bold">License type</label>
             <p id="license-type-hint" className="mb-1.5 text-[14px] text-[#4A5A6A]">
-              Technicians work for a company. Contractors run the business.
+              HVAC types are listed first. For HVAC, technicians work for a company and contractors run the business.
             </p>
             <select
               id="license-type"
