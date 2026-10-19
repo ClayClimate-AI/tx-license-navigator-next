@@ -1,4 +1,4 @@
 stage: H
-step: H3 (3 of 3) done; #11 ready to close
+step: H3 (3 of 3) done; #11 closed (ef5064a); CI added (3247c63)
 issue: #11
-title: Close · README, Actual, prompt log
+title: Deploy to Netlify · closed

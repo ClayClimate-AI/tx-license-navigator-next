@@ -4358,7 +4358,7 @@ flowchart TD
       <li><code>Started</code> on #11 at <code>2026-10-19T11:49:51Z</code>; now <code>12:54:25Z</code>: 1 h 05 min, rounds to 1 h</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not committed yet; Joseph's commit ends with <code>Closes #11</code></td></tr>
+  <tr><td><b>Commit</b></td><td><code>ef5064a</code> pushed to main (<code>3247c63..ef5064a</code>), <code>Closes #11</code>; #11 <code>CLOSED</code>; Netlify built <code>ef5064a</code> from GitHub (<code>ready</code>); CI passed on <code>ef5064a</code>. This hash goes in a log-only commit</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the app is live on Netlify, built from GitHub <code>main</code>, backed by Neon <code>production</code></li>
@@ -4368,7 +4368,7 @@ flowchart TD
       <li>What differed: "Live test" was missing on the recheck because Joseph deleted it during his manual check; a new one was posted (201)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Reflection</b></td><td></td></tr>
+  <tr><td><b>Reflection</b></td><td>I deployed the app to Netlify on Neon production, linked it to GitHub main so it deploys on every push, and confirmed the live URL works. This closes #11.</td></tr>
   <tr><td><b>Explained</b></td><td>
     <b>Entry 52 · #11 Deploy to Netlify</b>
     <ul>
