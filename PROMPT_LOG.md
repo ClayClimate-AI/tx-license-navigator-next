@@ -4118,7 +4118,7 @@ flowchart TD
       <li><code>grep</code> before the edit: "the other license type" only at <code>ResultCard.tsx:68</code> and the Week 4 table in <code>UI.md:44</code></li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>a414b73</code> pushed to main (<code>01691d9..a414b73</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the empty result no longer suggests there are only two license types; #7 offers 50</li>
@@ -4165,4 +4165,82 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 50 · #10 Footer stays at the bottom
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"go": step G4c, from Joseph's G2 screenshots: the navy footer sits mid-screen and jumps up and down on every save or delete. Same message: the 50-item license type menu fills the screen; recorded as skipped (native <code>&lt;select&gt;</code> menu is drawn by the OS; a custom combobox is post-demo work)</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>app/layout.tsx</code>: <code>&lt;body className="min-h-screen"&gt;</code></li>
+      <li><code>app/page.tsx</code>: header, <code>&lt;main&gt;</code>, footer as siblings</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 files modified
+    <ul>
+      <li>🟦 <code>app/layout.tsx</code> (modified) · <code>&lt;body&gt;</code> becomes <code>flex min-h-screen flex-col</code></li>
+      <li>🟦 <code>app/page.tsx</code> (modified) · <code>&lt;main&gt;</code> gains <code>w-full flex-1</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>npx eslint app/layout.tsx app/page.tsx</code>: no output</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the navy footer stays at the bottom of the window on short pages, so it no longer jumps when a card is saved or deleted</li>
+      <li>Input: none; layout only</li>
+      <li>Output: the body is a column at least one screen tall; <code>&lt;main&gt;</code> stretches to fill the space between header and footer</li>
+      <li>Flow: <code>layout.tsx</code> (<code>&lt;body&gt;</code> flex column) → <code>page.tsx</code> (header · <code>&lt;main&gt;</code> <code>flex-1</code> · footer)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>Made some minor UX adjustments on the navy footer.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 50 · #10 Footer stays at the bottom</b>
+    <ul>
+      <li>What it is: a sticky-footer layout with two Tailwind class changes</li>
+      <li>Why: Joseph saw the footer jump during the G2 browser checks</li>
+      <li>Files:
+        <ul>
+          <li><code>app/layout.tsx</code>: <code>&lt;body&gt;</code></li>
+          <li><code>app/page.tsx</code>: <code>&lt;main&gt;</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: a steadier page for the demo</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 50 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser]:::run
+  LY[app/layout.tsx<br/>body flex column]:::entry
+  PG[app/page.tsx<br/>main flex-1]:::entry
+  HD[components/SiteHeader.tsx]:::ui
+  NV[components/Navigator.tsx]:::ui
+  FT[components/SiteFooter.tsx]:::ui
+  TW[tailwindcss<br/>flex, min-h-screen, flex-1]:::css
+  BR --> LY
+  LY --> PG
+  PG --> HD
+  PG --> NV
+  PG --> FT
+  TW --> LY
+  TW --> PG
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef css fill:#c2410c,color:#fff,stroke:#fdba74
 ```

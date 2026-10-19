@@ -7,7 +7,8 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-4 py-6 md:px-6">
+      {/* flex-1 takes the leftover height; w-full keeps max-w-3xl wide inside the flex column. */}
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 md:px-6">
         <h1 className="text-[26px] font-bold leading-tight text-[#14304F]">
           Look up license demand by county
         </h1>

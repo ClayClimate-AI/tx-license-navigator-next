@@ -9,7 +9,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="antialiased">
-      <body className="min-h-screen">{children}</body>
+      {/* Column at least one screen tall, so the footer stays at the bottom on short pages. */}
+      <body className="flex min-h-screen flex-col">{children}</body>
     </html>
   );
 }
