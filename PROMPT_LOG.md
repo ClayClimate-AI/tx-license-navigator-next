@@ -4244,3 +4244,81 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef css fill:#c2410c,color:#fff,stroke:#fdba74
 ```
+
+## Entry 51 · #10 Close the done check
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · <code>gh</code></td></tr>
+  <tr><td><b>Asked</b></td><td>"g5": close #10: confirm #9's cut reason, tick #7's boxes, post the skip list, update the README, add <code>Actual:</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issues #7, #9, #10 on GitHub</li>
+      <li><code>README.md</code> Status table</li>
+      <li>G3 findings and Joseph's fix/skip decisions</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified, 3 GitHub edits
+    <ul>
+      <li><code>README.md</code> (modified) · #10 ✅ in the Status table</li>
+      <li>#7 body · four acceptance boxes ticked</li>
+      <li>#10 comment · check results, 3 fixes with commits, each skipped finding with its reason</li>
+      <li>#10 body · three acceptance boxes ticked, <code>Actual: 1 h (wall clock, includes breaks)</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>#9 comment: "Cut 1 (tasks.md): all remaining work must finish Sat Oct 17; …"</li>
+      <li><code>Started</code> on #10 at <code>2026-10-19T10:28:20Z</code>; now <code>11:26:05Z</code>: 58 min, rounds to 1 h</li>
+      <li><code>gh issue view 10 --json state</code>: <code>CLOSED</code> after the push</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>2d0aaa9</code> pushed to main (<code>8620348..2d0aaa9</code>), <code>Closes #10</code>; this entry follows in a log-only commit</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: records the done check on GitHub and in the README, so #10 closes and #11 can start</li>
+      <li>Input: #7, #9, #10 on GitHub, the <code>Started</code> time, the README Status table</li>
+      <li>Output: issue edits, one comment on #10, one README line</li>
+      <li>Flow: <code>gh issue view</code> → scratchpad body file → <code>gh issue edit</code> / <code>gh issue comment</code> → README edit → Joseph's commit with <code>Closes #10</code></li>
+      <li>What differed: Joseph committed and pushed before this entry was written, so the entry goes in its own commit</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>none</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 51 · #10 Close the done check</b>
+    <ul>
+      <li>What it is: the paperwork that closes #10</li>
+      <li>Why: #10's ACs 2 and 3, and the loop's close rule (<code>Actual:</code>, README status, <code>Closes #N</code>)</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: Status table</li>
+        </ul>
+      </li>
+      <li>Its role in the project: #10 closed in 1 h against 1.5 h; next is #11 Deploy</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 51 call graph
+
+```mermaid
+flowchart TD
+  AG[Claude Code<br/>gh CLI]:::tool
+  I7[GitHub #7<br/>boxes ticked]:::run
+  I9[GitHub #9<br/>cut reason checked]:::run
+  I10[GitHub #10<br/>skip list, Actual]:::run
+  RM[README.md<br/>Status table]:::tool
+  JO[Joseph<br/>commit Closes #10]:::run
+  AG --> I9
+  AG --> I7
+  AG --> I10
+  AG --> RM
+  RM --> JO
+  JO -->|push closes| I10
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
