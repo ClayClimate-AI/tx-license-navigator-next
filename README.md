@@ -92,6 +92,7 @@ Saved searches go through Prisma to Neon. Counts go through `lib/tdlr.ts` to TDL
 
 | Route | Returns |
 |---|---|
+| `GET /api/types` | `{ types: [{ name, holders }] }`, top 50 from TDLR · 502 TDLR error · 504 after 8 s |
 | `GET /api/count?type=&county=` | `{ count, queryUrl }` from TDLR · 400 bad query · 502 TDLR error · 504 after 8 s |
 | `GET /api/searches` | saved searches, newest first |
 | `POST /api/searches` | saves `{ licenseType, county, label, note? }` · 201 · 400 bad body · 409 already saved |

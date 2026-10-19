@@ -3419,7 +3419,7 @@ flowchart TD
       <li>Same query sent to TDLR with <code>curl</code>: 50 rows, first <code>Apprentice Electrician</code> 274391; <code>A/C Technician</code> at index 3, <code>A/C Contractor</code> at index 9 (F3 must remove them from "All other")</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>ef124b2</code> feat: fetchTopTypes for the top 50 license types; prompt log entry 40</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the server can ask TDLR for the 50 license types with the most holders [S1]</li>
@@ -3459,5 +3459,81 @@ flowchart TD
   API -->|not ok| ERR
   API -->|no answer in 8 s| ERR
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 41 · #7 GET /api/types
+
+*Oct 18 · ~19:20 to 19:30 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step F2 only: a <code>GET /api/types</code> route that calls <code>fetchTopTypes()</code>, with 502 and 504 like <code>/api/count</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #7 ACs; <code>docs/spec/design.md</code> API contracts (types: 200, 502, 504)</li>
+      <li><code>app/api/count/route.ts</code> (the error mapping to copy); <code>lib/tdlr.ts</code> from Entry 40</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file new, 1 modified
+    <ul>
+      <li>🟥 <code>app/api/types/route.ts</code> (new) · <code>GET()</code> returns <code>{ types }</code>; on <code>TdlrError</code> returns <code>{ error, status }</code> with 504 for a timeout, 502 otherwise; no Zod, since the route takes no input</li>
+      <li><code>README.md</code> (modified) · routes table gets the <code>GET /api/types</code> row</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npm run dev</code> started on localhost:3000</li>
+      <li><code>curl -s localhost:3000/api/types | jq</code>: length <code>50</code>; first <code>{ "name": "Apprentice Electrician", "holders": 274391 }</code> (a number, not a string); <code>.error</code> <code>null</code></li>
+      <li>502 and 504 paths not forced in this step; F4 checks the error behaviour</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the browser can get the live type list without calling TDLR itself [P1]</li>
+      <li>Input: none (no query, no body)</li>
+      <li>Output: 200 <code>{ types: [{ name, holders }] }</code>, or 502 / 504 <code>{ error, status }</code></li>
+      <li>Flow: browser <code>fetch("/api/types")</code> → <code>route.ts</code> <code>GET</code> → <code>fetchTopTypes</code> → TDLR API → JSON</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>The browser can now get the top 50 types from <code>/api/types</code>.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 41 · #7 GET /api/types</b>
+    <ul>
+      <li>What it is: the browser's door to the type list</li>
+      <li>Why: <code>lib/tdlr.ts</code> is server only, so the browser needs a route to reach it</li>
+      <li>Files:
+        <ul>
+          <li><code>app/api/types/route.ts</code>: <code>GET</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: <code>lib/tdlr.ts</code> finds the problem; the route picks the status code, same split as <code>/api/count</code></li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 41 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>fetch /api/types]:::run
+  RT[app/api/types/route.ts<br/>GET]:::server
+  FT[lib/tdlr.ts<br/>fetchTopTypes]:::tdlr
+  API[TDLR API<br/>data.texas.gov 7358-krk7]:::run
+  OK[200 types x 50]:::server
+  E502[502 TDLR error]:::server
+  E504[504 after 8 s]:::server
+  BR --> RT
+  RT --> FT
+  FT --> API
+  RT -->|list| OK
+  RT -->|TdlrError| E502
+  RT -->|timedOut| E504
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```
