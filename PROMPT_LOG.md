@@ -3345,7 +3345,7 @@ flowchart TD
       <li><code>gh issue edit 8</code>: boxes ticked, Actual 3.5 h (Started 15:49:01Z, now 19:12:48Z)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending (Joseph commits)</td></tr>
+  <tr><td><b>Commit</b></td><td><code>5d6da70</code> docs: #8 checks pass; README status; prompt log entry 39. Closes #8</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: prove every #8 acceptance criterion and close the issue</li>
@@ -3387,4 +3387,77 @@ flowchart TD
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+```
+
+## Entry 40 · #7 lib/tdlr.ts top 50 types fetcher
+
+*Oct 18 · ~19:00 to 19:15 CT*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Started on #10, found #7 still open as its blocker. Weighed cut 2, then kept #7 ("we can't just have the two of them"): #7 first, then #10. Step F1 only: port Week 4's types query to <code>lib/tdlr.ts</code></td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #7 ACs; <code>docs/spec/requirements.md</code> S1, P1; <code>docs/spec/design.md</code> API contracts (types); <code>docs/spec/tasks.md</code> cut order</li>
+      <li>Week 4 <code>src/api/tdlr.js</code> (<code>buildTypesUrl</code>, <code>fetchLicenseTypes</code>), read with <code>gh api</code> (read only)</li>
+      <li><code>lib/tdlr.ts</code> from Entry 30 (<code>TdlrError</code>, <code>noAnswer</code>, <code>TIMEOUT_MS</code>)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟫 <code>lib/tdlr.ts</code> (modified) · <code>buildTypesUrl()</code> (SoQL: <code>license_type</code>, <code>count(*)</code>, <code>$group</code>, <code>$order</code> holders desc, <code>$limit</code> 50) · <code>LicenseType</code> type · <code>fetchTopTypes()</code> with <code>cache: "no-store"</code> and <code>AbortSignal.timeout(8000)</code></li>
+      <li>Changed from Week 4: field is <code>name</code> (design.md contract) instead of <code>licenseType</code>; errors reuse <code>TdlrError</code> and <code>noAnswer</code>; timeout added</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>gh issue comment 7</code>: <code>Started</code> posted</li>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li>Same query sent to TDLR with <code>curl</code>: 50 rows, first <code>Apprentice Electrician</code> 274391; <code>A/C Technician</code> at index 3, <code>A/C Contractor</code> at index 9 (F3 must remove them from "All other")</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the server can ask TDLR for the 50 license types with the most holders [S1]</li>
+      <li>Input: none; it reads only TDLR's dataset URL</li>
+      <li>Output: <code>[{ name, holders }]</code>, 50 entries, largest first, or a thrown <code>TdlrError</code> (TDLR's HTTP code, or <code>null</code> plus <code>timedOut</code> after 8 s)</li>
+      <li>Flow: <code>fetchTopTypes</code> → <code>buildTypesUrl</code> → <code>fetch</code> (no-store, 8 s) → TDLR API → rows → <code>Number(holders)</code> → array</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>The server can now ask TDLR for the 50 license types with the most holders. This turned out to be the better approach: at first we had only two types, and being able to choose from many types gives the application real depth, especially when TDLR can send back the top 50 by holders. This function takes no input; it reads only TDLR's data URL. The output is the names and holder counts, 50 entries, largest first, or we get back an HTTP status for a TDLR error, or a timeout after 8 seconds.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 40 · #7 lib/tdlr.ts top 50 types fetcher</b>
+    <ul>
+      <li>What it is: a second TDLR query next to the count, ported from Week 4</li>
+      <li>Why: S1 asks for live types; two HVAC types made the app feel thin</li>
+      <li>Files:
+        <ul>
+          <li><code>lib/tdlr.ts</code>: <code>buildTypesUrl</code>, <code>LicenseType</code>, <code>fetchTopTypes</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: <code>$group</code> makes TDLR count holders per type instead of for one pair; still counts only [P1]</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 40 call graph
+
+```mermaid
+flowchart TD
+  FT[lib/tdlr.ts<br/>fetchTopTypes]:::tdlr
+  BT[lib/tdlr.ts<br/>buildTypesUrl]:::tdlr
+  API[TDLR API<br/>data.texas.gov 7358-krk7]:::run
+  LIST[name, holders x 50<br/>largest first]:::tdlr
+  ERR[TdlrError<br/>status or null, timedOut]:::tdlr
+  FT --> BT
+  BT -->|SoQL URL group by type| API
+  API -->|200 rows| LIST
+  API -->|not ok| ERR
+  API -->|no answer in 8 s| ERR
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```

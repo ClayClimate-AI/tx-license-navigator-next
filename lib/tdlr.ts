@@ -59,3 +59,34 @@ export async function fetchHolderCount(type: string, county: string, breakColumn
   if (Number.isNaN(holders)) throw new TdlrError("TDLR returned a count that is not a number", null);
   return holders;
 }
+
+// Top 50 license types by holder count, largest first. Still counts only: type and count(*). [S1, P1]
+export function buildTypesUrl(): string {
+  const params = new URLSearchParams({
+    $select: "license_type, count(*) AS holders",
+    $where: "license_type IS NOT NULL",
+    $group: "license_type",
+    $order: "holders DESC",
+    $limit: "50",
+  });
+  return `${DATASET_URL}?${params}`;
+}
+
+export type LicenseType = { name: string; holders: number };
+
+export async function fetchTopTypes(): Promise<LicenseType[]> {
+  let rows: { license_type: string; holders: string }[];
+  try {
+    const res = await fetch(buildTypesUrl(), {
+      cache: "no-store",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) throw new TdlrError(`TDLR answered HTTP ${res.status}`, res.status);
+    rows = await res.json();
+  } catch (err) {
+    throw err instanceof TdlrError ? err : noAnswer(err);
+  }
+
+  // Socrata returns counts as strings ("60809"), so convert before use.
+  return rows.map((row) => ({ name: row.license_type, holders: Number(row.holders) }));
+}
