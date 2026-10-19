@@ -4407,3 +4407,76 @@ flowchart TD
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
+
+## Entry 53 · #11 Context docs match the deploy and CI
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · <code>gh</code></td></tr>
+  <tr><td><b>Asked</b></td><td>"Update all corresponding context documentation as well"</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>grep</code> for Netlify, Neon branch, deploy, #11 lines in <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>docs/spec/*</code></li>
+      <li>Facts from Entry 52 and the CI runs</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    5 files modified, plus memory outside the repo
+    <ul>
+      <li><code>docs/spec/requirements.md</code> · V1 says Neon <code>production</code>; met Mon Oct 19 with the live URL</li>
+      <li><code>docs/spec/design.md</code> · file tree adds <code>ci.yml</code>, <code>eslint.config.mjs</code>; Deploy and CI bullets; Node 22 in CI</li>
+      <li><code>docs/spec/tasks.md</code> · new "Status · Mon Oct 19": all issues closed, live, CI, post-demo backlog</li>
+      <li><code>CLAUDE.md</code> · Neon project and org ids, Netlify site and GitHub build, the no-print rule for <code>env:set</code>, CI line, RAG line says Monday, Tools layer and <code>run</code> list updated</li>
+      <li><code>README.md</code> · Stack table Hosting and CI rows, Deploy step 3 mentions CI, layout lists <code>.github/</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>git status</code> before the commit: the 5 docs and <code>.claude/progress.txt</code> modified; <code>AGENTS.md</code> unchanged (only Next.js's auto block)</li>
+      <li>CI run <code>39260449079</code> on <code>0f8f8e5</code>: passed</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>0f8f8e5</code> pushed to main (<code>b91e932..0f8f8e5</code>); this entry follows in a log-only commit</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the spec, project instructions, and README describe the app as it now runs, so the next session starts from true facts</li>
+      <li>Input: stale lines found by <code>grep</code>; the deploy and CI facts from this session</li>
+      <li>Output: edits to 5 docs and one memory file</li>
+      <li>Flow: <code>grep</code> → read each section → Edit → <code>git status</code> → Joseph's commit → CI</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>I almost set CI to Node 20, but the project runs on Node 22, so CI would have tested a different setup than the live site. Reading <code>.nvmrc</code> keeps CI, my laptop, and Netlify on the same version.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 53 · #11 Context docs match the deploy and CI</b>
+    <ul>
+      <li>What it is: the docs catch up with the deploy and CI</li>
+      <li>Why: <code>CLAUDE.md</code> said env vars were pasted by hand and named no CI; <code>requirements.md</code> named Neon <code>main</code></li>
+      <li>Files: <code>CLAUDE.md</code>, <code>README.md</code>, <code>docs/spec/requirements.md</code>, <code>design.md</code>, <code>tasks.md</code></li>
+      <li>Its role in the project: closes the paperwork on #11 before the demo</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 53 call graph
+
+```mermaid
+flowchart TD
+  AG[Claude Code<br/>grep and Edit]:::tool
+  RQ[requirements.md<br/>V1 production, met]:::run
+  DS[design.md<br/>Deploy, CI, tree]:::run
+  TK[tasks.md<br/>Status Mon Oct 19]:::run
+  CM[CLAUDE.md<br/>Netlify, CI, legend]:::run
+  RM[README.md<br/>Stack, Deploy, layout]:::run
+  CI[ci.yml<br/>CI run passed]:::tool
+  AG --> RQ
+  AG --> DS
+  AG --> TK
+  AG --> CM
+  AG --> RM
+  RM -->|push 0f8f8e5| CI
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```

@@ -2,6 +2,9 @@
 
 # Second Chance License Navigator
 
+[![CI](https://github.com/ClayClimate-AI/tx-license-navigator-next/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ClayClimate-AI/tx-license-navigator-next/actions/workflows/ci.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f7f9204a-628d-4de3-ac4f-c6f1e621048b/deploy-status)](https://app.netlify.com/projects/tx-license-navigator-next/deploys)
+
 See how many people hold a Texas occupational license in a county, using live data from the Texas Department of Licensing and Regulation (TDLR), and keep a watchlist of saved searches so job seekers can track local demand before they train.
 
 Week 5 rebuild of the Week 4 app in Next.js, adding a saved-searches watchlist stored in Neon Postgres.
