@@ -42,7 +42,8 @@ The app asks TDLR for counts and nothing else. It never fetches or shows names, 
 | Database | Neon Postgres (`dev` branch for building, `production` for the live site) |
 | ORM | Prisma 7.10.0, pinned exactly (npm's `latest` tag is an 8.0 release candidate), with `@prisma/adapter-neon` |
 | Validation | Zod 4 on every request body, query, and id |
-| Hosting | Netlify |
+| Hosting | Netlify, built from GitHub `main` on every push |
+| CI | GitHub Actions: install, `prisma generate`, lint, build on push and pull request to `main` |
 | Runtime | Node 22 or later (`.nvmrc`) |
 
 ## How a request flows
@@ -97,7 +98,7 @@ Netlify builds from GitHub: every push to `main` runs `npm run build` and publis
 1. Apply migrations to `production` once, from the laptop, with `DIRECT_URL` set for that one command (`.env` stays on `dev`):
    `DIRECT_URL="<production direct string>" npx prisma migrate deploy`
 2. In Netlify (Project configuration → Environment variables), set `DATABASE_URL` (pooled) and `DIRECT_URL` (direct) to the Neon `production` strings.
-3. Push to `main`. Netlify builds and publishes.
+3. Push to `main`. Netlify builds and publishes, and CI (`.github/workflows/ci.yml`) runs lint and build on Node 22 from `.nvmrc`. CI uses a placeholder `DATABASE_URL` and no secrets.
 
 ## API routes
 
@@ -118,6 +119,7 @@ components/   🟩 header, trust note, footer, and the search and watchlist UI
 lib/          🟩 counties.ts · 🟥 validation.ts · ⬛ db.ts · 🟫 tdlr.ts
 prisma/       ⬛ schema.prisma and migrations
 docs/spec/    requirements, design, tasks
+.github/      🟪 workflows/ci.yml
 ```
 
 ## How it's built

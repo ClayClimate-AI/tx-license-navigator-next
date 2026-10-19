@@ -59,7 +59,7 @@ People with a criminal record deciding whether an HVAC trade is worth training f
 
 ## Delivery
 
-- **V1** The app shall be live on Netlify, backed by Neon `main`, by Thursday Oct 15 night.
+- **V1** The app shall be live on Netlify, backed by Neon `production` (the project's default branch; first written as `main`), by Thursday Oct 15 night. Met Mon Oct 19, after the demo moved: https://tx-license-navigator-next.netlify.app (#11).
 
 ## Out of scope this week
 

@@ -44,6 +44,14 @@ Decided by Joseph, Sat Oct 17 ~13:45 CT.
 - **Build work now runs into Sunday and Monday morning.** Left, by the issue estimates: #6 ~1 h, #8 1.5 h, #10 1.5 h, #11 1.5 h, Monday demo prep ~1 h (≈ 6.5 h), plus #7 1 h if kept. At this week's pace, expect about 1.3× that.
 - **Open, for Joseph:** how many hours Sunday allows around school work, and the demo time on Monday. Those decide whether #7 is built or cut.
 
+## Status · Mon Oct 19 (~08:30 CT, before the 10:00 demo)
+
+- **Every issue is closed.** #7 (`9ba1c7e`), #10 (`2d0aaa9`, Actual 1 h), #11 (`ef5064a`, Actual 1 h against 1.5 h). #9 stays cut (cut 1). Cut 4 was not needed.
+- **Live:** https://tx-license-navigator-next.netlify.app, Netlify builds from GitHub `main` on every push, backed by Neon `production`. Live checks: `/`, `/api/types`, `/api/searches` 200; POST "Live test" 201.
+- **#11 ran with CLIs instead of the planned wizard:** `neonctl` for the `production` strings (never printed), `prisma migrate deploy` with `DIRECT_URL` for one command, `netlify-cli` to create the site and set both env vars, then the repo linked in the Netlify UI.
+- **CI added after #11** (`3247c63`): `.github/workflows/ci.yml` (install, generate, lint, build on Node 22 from `.nvmrc`); passing on `3247c63`, `ef5064a`, `b91e932`. `eslint.config.mjs` ignores `.netlify/`.
+- **Left:** Monday demo prep (below). Post-demo backlog: the skip list comment on #10, and bumping `actions/checkout` and `actions/setup-node` to `@v5` (CI warns the `@v4` actions target Node 20).
+
 ## Why the build ran over time and tokens
 
 Estimates against actuals, closed issues (wall clock from `Started`, includes breaks and overnight gaps):

@@ -35,14 +35,16 @@ End each task with this report, in short lines:
   - Generator `provider = "prisma-client"` with an explicit `output`.
 - Zod validates every request body and `params.id` at the route.
 - In route handlers, `params` is a Promise: `const { id } = await params`.
-- Neon: build on the `dev` branch; `production` (Neon's default branch) serves the live Netlify site. Netlify env vars are pasted by hand from the Neon console.
+- Neon: build on the `dev` branch; `production` (Neon's default branch) serves the live Netlify site. Project `plain-tree-41915580`; `neonctl` needs `--org-id org-rough-forest-28889979` (it otherwise stops at an org picker).
+- Netlify: site `tx-license-navigator-next`, https://tx-license-navigator-next.netlify.app, builds from GitHub `main` on every push. Its `DATABASE_URL` and `DIRECT_URL` hold the Neon `production` strings, set with `netlify env:set` from `neonctl connection-string` inside one command. Never print a connection string or write it to a file; `netlify env:set` echoes the value, so send its output to `/dev/null`.
+- CI: `.github/workflows/ci.yml` runs install, `prisma generate`, lint, build on push and pull request to `main`, Node from `.nvmrc`, placeholder `DATABASE_URL` only, no secrets.
 
 ## Hard rules
 
 - **Counts only.** TDLR queries use only `license_type`, `business_county`, and `count(*)`. The app never fetches or shows names, addresses, or license numbers.
 - `lib/tdlr.ts` runs on the server only; the browser reaches TDLR through `/api/count` and `/api/types`.
 - Secrets live in `.env` (git-ignored). `.env.example` lists variable names with no values.
-- Scope is what `docs/spec/` describes. The "Ask the law" RAG stretch waits until after the Friday demo. If time runs short, follow the cut order in `tasks.md`.
+- Scope is what `docs/spec/` describes. The "Ask the law" RAG stretch waits until after the demo (moved to Monday Oct 19). If time runs short, follow the cut order in `tasks.md`.
 
 ## Where things are decided
 
@@ -63,7 +65,7 @@ After Joseph accepts a step, add an entry to `PROMPT_LOG.md`, with the issue num
 - Every entry gets a `### Entry N call graph` (mermaid `flowchart TD`, one node, edge, or `classDef` per line, `classDef` lines last and only for layers used). Add a `sequenceDiagram` only when a flow crosses layers and timing matters.
 - Class names are the ones below. Mermaid keywords (`style`, `class`, `end`, `graph`, `default`) break rendering, so they never serve as class names.
 
-Legend: exactly 8 layers. Things outside the code (Browser, TDLR API) use `run` and are not a legend layer.
+Legend: exactly 8 layers. Things outside the code (Browser, TDLR API, GitHub, Netlify) use `run` and are not a legend layer.
 
 | Layer | Files | Class | classDef |
 |---|---|---|---|
@@ -73,9 +75,9 @@ Legend: exactly 8 layers. Things outside the code (Browser, TDLR API) use `run` 
 | 🟫 TDLR | `lib/tdlr.ts` | `tdlr` | `fill:#78350f,color:#fff,stroke:#d6a77a` |
 | ⬛ Database | `prisma/schema.prisma`, `prisma.config.ts`, `lib/db.ts`, Neon | `db` | `fill:#111827,color:#fff,stroke:#9ca3af` |
 | 🟧 Style | `app/globals.css`, `tailwindcss` | `css` | `fill:#c2410c,color:#fff,stroke:#fdba74` |
-| 🟪 Tools | `next.config.ts`, `tsconfig.json`, `next`, `prisma` CLI | `tool` | `fill:#7e22ce,color:#fff,stroke:#d8b4fe` |
+| 🟪 Tools | `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `.github/workflows/ci.yml`, `next`, `prisma`, `netlify`, `neonctl` CLIs | `tool` | `fill:#7e22ce,color:#fff,stroke:#d8b4fe` |
 | 🟨 Dependencies | `package.json`, `package-lock.json` | `deps` | `fill:#a16207,color:#fff,stroke:#fde68a` |
-| (outside) | Browser, TDLR API | `run` | `fill:#334155,color:#fff,stroke:#94a3b8` |
+| (outside) | Browser, TDLR API, GitHub, Netlify | `run` | `fill:#334155,color:#fff,stroke:#94a3b8` |
 
 Update a layer's file list when a task adds a file to it.
 
