@@ -4277,7 +4277,7 @@ flowchart TD
       <li><code>gh issue view 10 --json state</code>: <code>CLOSED</code> after the push</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td><code>2d0aaa9</code> pushed to main (<code>8620348..2d0aaa9</code>), <code>Closes #10</code>; this entry follows in a log-only commit</td></tr>
+  <tr><td><b>Commit</b></td><td><code>2d0aaa9</code> pushed to main (<code>8620348..2d0aaa9</code>), <code>Closes #10</code>; this entry in <code>c7e265f</code> (<code>2d0aaa9..c7e265f</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: records the done check on GitHub and in the README, so #10 closes and #11 can start</li>
@@ -4321,4 +4321,89 @@ flowchart TD
   JO -->|push closes| I10
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+## Entry 52 · #11 Deploy to Netlify
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · <code>neonctl</code> · <code>netlify-cli</code> · <code>prisma</code> · <code>gh</code> · <code>curl</code></td></tr>
+  <tr><td><b>Asked</b></td><td>Skip the wizard; deploy with <code>neonctl</code> and <code>netlify-cli</code>, never printing connection strings. Then link the existing site to GitHub <code>main</code>, recheck the live URL, and close #11</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #11 acceptance criteria · <code>docs/spec/design.md</code> Database: migrations</li>
+      <li><code>prisma.config.ts</code> (<code>DIRECT_URL</code> via <code>process.env</code>) · <code>package.json</code> build script</li>
+      <li>Neon console screenshot: branches <code>production</code> (Default) and <code>dev</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 repo file modified, plus Neon, Netlify and GitHub
+    <ul>
+      <li><code>README.md</code> (modified) · live URL, Deploy section, #11 ✅ in the Status table</li>
+      <li>Neon <code>production</code> · migration <code>20261016004014_init</code> applied</li>
+      <li>Netlify site <code>tx-license-navigator-next</code> (new) · <code>DATABASE_URL</code>, <code>DIRECT_URL</code> set · linked to GitHub <code>main</code>, <code>npm run build</code></li>
+      <li>#11 body · <code>Actual: 1 h (wall clock, includes breaks)</code> and a note that "Neon <code>main</code>" means <code>production</code></li>
+      <li>Outside the repo: Neon MCP server (OAuth, user scope) in <code>~/.claude.json</code>; <code>neon</code> skill in <code>~/.claude/skills/neon/</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>prisma migrate deploy</code>: "All migrations have been successfully applied" on host <code>ep-jolly-cell-…</code>; that host is not in <code>.env</code> (dev)</li>
+      <li><code>netlify env:list</code> keys: <code>["DATABASE_URL","DIRECT_URL"]</code></li>
+      <li>Latest deploy: <code>branch main</code>, <code>commit_ref c7e265f</code>, <code>state ready</code> (built by Netlify from GitHub)</li>
+      <li>Live URL: <code>GET /</code> 200 · <code>GET /api/types</code> 200 · <code>GET /api/searches</code> 200 · <code>POST /api/searches</code> "Live test" 201 · list shows <code>["Live test"]</code></li>
+      <li><code>Started</code> on #11 at <code>2026-10-19T11:49:51Z</code>; now <code>12:54:25Z</code>: 1 h 05 min, rounds to 1 h</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not committed yet; Joseph's commit ends with <code>Closes #11</code></td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the app is live on Netlify, built from GitHub <code>main</code>, backed by Neon <code>production</code></li>
+      <li>Input: Neon <code>production</code> strings (fetched inside each command, never printed), site name, GitHub repo and branch</li>
+      <li>Output: <code>SavedSearch</code> table on <code>production</code>, Netlify site with 2 env vars, a GitHub-built production deploy, README Deploy section</li>
+      <li>Flow: <code>neonctl</code> → <code>prisma migrate deploy</code> → <code>netlify sites:create</code> → <code>env:set</code> ×2 → CLI deploy → link repo → Netlify builds <code>main</code> → <code>curl</code> checks → Neon <code>production</code></li>
+      <li>What differed: "Live test" was missing on the recheck because Joseph deleted it during his manual check; a new one was posted (201)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td></td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 52 · #11 Deploy to Netlify</b>
+    <ul>
+      <li>What it is: the live site, built by Netlify from GitHub, writing to Neon <code>production</code></li>
+      <li>Why: <code>requirements.md</code> V1, the live site for the demo</li>
+      <li>Files:
+        <ul>
+          <li><code>README.md</code>: live URL, Deploy section, Status table</li>
+        </ul>
+      </li>
+      <li>Its role in the project: the last issue; #11 closed in 1 h against 1.5 h</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 52 call graph
+
+```mermaid
+flowchart TD
+  AG[Claude Code<br/>neonctl, netlify-cli]:::tool
+  PM[prisma migrate deploy<br/>DIRECT_URL for one command]:::tool
+  NP[Neon production<br/>SavedSearch table]:::db
+  GH[GitHub main]:::run
+  NL[Netlify<br/>npm run build]:::run
+  RT[app/api/searches/route.ts]:::server
+  BR[curl / Browser<br/>live URL]:::run
+  AG --> PM
+  PM --> NP
+  AG -->|env:set ×2| NL
+  GH -->|linked repo| NL
+  BR -->|fetch| RT
+  NL -->|serves| RT
+  RT -->|pooled DATABASE_URL| NP
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```

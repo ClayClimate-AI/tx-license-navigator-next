@@ -6,6 +6,8 @@ See how many people hold a Texas occupational license in a county, using live da
 
 Week 5 rebuild of the Week 4 app in Next.js, adding a saved-searches watchlist stored in Neon Postgres.
 
+**Live:** https://tx-license-navigator-next.netlify.app
+
 ## What it does
 
 - **Search:** pick a license type and one of 13 Texas counties, get the live number of license holders there.
@@ -29,7 +31,7 @@ The app asks TDLR for counts and nothing else. It never fetches or shows names, 
 | | #8 | Save a search to the watchlist | ✅ |
 | E · Counts and done check | #9 | Live counts on saved cards | ✂️ cut |
 | | #10 | Done check | ✅ |
-| F · Deploy | #11 | Deploy to Netlify | ⬜ |
+| F · Deploy | #11 | Deploy to Netlify | ✅ |
 
 ## Stack
 
@@ -87,6 +89,15 @@ Saved searches go through Prisma to Neon. Counts go through `lib/tdlr.ts` to TDL
 | `npm run dev` | Development server |
 | `npm run build` | `prisma generate`, then `next build` (the same build Netlify runs) |
 | `npm run lint` | ESLint |
+
+## Deploy
+
+Netlify builds from GitHub: every push to `main` runs `npm run build` and publishes to https://tx-license-navigator-next.netlify.app. The live site uses Neon's `production` branch.
+
+1. Apply migrations to `production` once, from the laptop, with `DIRECT_URL` set for that one command (`.env` stays on `dev`):
+   `DIRECT_URL="<production direct string>" npx prisma migrate deploy`
+2. In Netlify (Project configuration → Environment variables), set `DATABASE_URL` (pooled) and `DIRECT_URL` (direct) to the Neon `production` strings.
+3. Push to `main`. Netlify builds and publishes.
 
 ## API routes
 

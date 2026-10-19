@@ -1,4 +1,4 @@
-stage: G
-step: G5 (5 of 5) done, #10 closed; next #11 Deploy
-issue: #10
-title: Done check
+stage: H
+step: H3 (3 of 3) done; #11 ready to close
+issue: #11
+title: Close · README, Actual, prompt log
