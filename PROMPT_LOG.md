@@ -3721,7 +3721,7 @@ flowchart TD
       <li>Joseph: "all checks pass" (Try again brings the form back; Try again after a failed search repeats the search)</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>9ba1c7e</code> pushed to main (<code>da1304a..9ba1c7e</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: if TDLR fails while the license types load, the visitor sees the Week 4 error card and Try again instead of a half-filled select</li>
@@ -3781,4 +3781,171 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 45 · #10 API and privacy checks
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"Commence number 10 for done check", then "go": step G1 only, the manual checks the agent can run without a browser</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #10 ACs; <code>docs/spec/tasks.md</code> Manual check list</li>
+      <li><code>lib/validation.ts</code>, <code>app/api/searches/route.ts</code>, <code>app/api/searches/[id]/route.ts</code>, <code>app/api/count/route.ts</code>, read only</li>
+      <li>Dev server already running on <code>localhost:3000</code> (a second <code>npm run dev</code> exited)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    No app files changed
+    <ul>
+      <li><code>.claude/progress.txt</code> (modified) · stage G</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>POST <code>/api/searches</code> with empty label: HTTP 400 "Check the label and note, then try again."</li>
+      <li>DELETE <code>/api/searches/abc</code>: HTTP 400 "That is not a valid saved search id."</li>
+      <li>DELETE and PATCH <code>/api/searches/99999</code>: HTTP 404 "That saved search no longer exists."</li>
+      <li>POST A/C Contractor + HARRIS (already id 12): HTTP 409 "You already saved this search."</li>
+      <li><code>/api/count?…&amp;break=column</code>: HTTP 502 <code>{"status":400}</code>; without <code>break</code>: HTTP 200 <code>{"count":3043}</code></li>
+      <li><code>grep</code> for name, address, license number and phone fields in <code>app</code>, <code>components</code>, <code>lib</code>: only the <code>TrustNote</code> sentence; <code>lib/tdlr.ts</code> selects only <code>license_type</code>, the county column and <code>count(*)</code></li>
+      <li><code>.gitignore</code> has <code>.env*</code> and <code>!.env.example</code>; <code>gh api …/contents/.env</code>: HTTP 404</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: proves the server rules in the spec hold when the routes are called directly, without the UI</li>
+      <li>Input: <code>curl</code> requests to <code>/api/searches</code>, <code>/api/searches/[id]</code>, <code>/api/count</code></li>
+      <li>Output: status codes and JSON error messages; no rows written</li>
+      <li>Flow: <code>curl</code> → <code>route.ts</code> → Zod (400) → Prisma → Neon (404 P2025, 409 P2002); <code>curl</code> → <code>/api/count</code> → <code>lib/tdlr.ts</code> → TDLR (400 inside a 502)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>none</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 45 · #10 API and privacy checks</b>
+    <ul>
+      <li>What it is: check list items 3 (<code>curl</code>) and 8 (privacy), plus the API half of item 5 (<code>?break=column</code>)</li>
+      <li>Why: #10's first AC, "Every item on the manual check list passes on localhost"</li>
+      <li>Files: none changed</li>
+      <li>Its role in the project: the server side of the done check; the browser side is G2</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 45 call graph
+
+```mermaid
+flowchart TD
+  CU[curl]:::run
+  RS[app/api/searches/route.ts<br/>POST]:::server
+  RI[app/api/searches/id/route.ts<br/>PATCH, DELETE]:::server
+  RC[app/api/count/route.ts<br/>GET]:::server
+  VA[lib/validation.ts<br/>Zod]:::server
+  DB[lib/db.ts<br/>Prisma to Neon]:::db
+  TD[lib/tdlr.ts<br/>fetchHolderCount]:::tdlr
+  API[TDLR API]:::run
+  CU --> RS
+  CU --> RI
+  CU --> RC
+  RS --> VA
+  RI --> VA
+  RC --> VA
+  VA -->|bad input 400| CU
+  RS --> DB
+  RI --> DB
+  DB -->|404 or 409| CU
+  RC --> TD
+  TD --> API
+  API -->|count or 400| TD
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 46 · #10 Browser checks
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"G2": the manual checks only Joseph can run, in the browser, Neon console and terminal</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>docs/spec/tasks.md</code> Manual check list, items 1, 2, 4, 5, 6, 7, 8</li>
+      <li><code>docs/spec/design.md</code>: status line wording [A1], focus rules [A2], empty list wording [R2]</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    No app files changed
+    <ul>
+      <li><code>.claude/progress.txt</code> (modified)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>Joseph: "all checks passed" (keyboard-only Loving search, save, edit, cancel, keep, delete with Network statuses, status lines, focus and Neon rows; reload; dev server restart; <code>?break=column</code> error card with code 400; no personal data on the page)</li>
+      <li>Check 5, saved cards part: N/A, #9 cut (cut 1), cards show no counts</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: proves the app behaves as the spec says from the user's side: persistence, network statuses, focus and announcements</li>
+      <li>Input: keyboard actions, a reload, a dev server restart, <code>?break=column</code></li>
+      <li>Output: 201/200/204 statuses; "Saved." · "Changes saved." · "Deleted."; focus per [A2]; Neon rows match the page</li>
+      <li>Flow: keyboard → <code>Navigator</code> → <code>fetch</code> → <code>route.ts</code> → Zod → Prisma → Neon → refetch → status line and focus</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>G1 showed the server follows the rules. G2 shows a person gets what the specifications promise; the two can disagree. A route can return a 201 while the page never refreshes, focus lands nowhere, or a screen reader user hears nothing. So G2 tested three promises that the server can't prove on its own:
+    <ol>
+      <li>Data survives. It lives in Neon, not in the browser or the server's memory; reload and restart showed that.</li>
+      <li>The page tells the truth. What you see on the screen matches the Neon table after create, edit and delete.</li>
+      <li>Everyone can use it. Keyboard-only users and screen reader users get told what happened, if it was saved, if it was deleted, and land in a sensible place, so they never have to hunt for where they are.</li>
+    </ol>
+  </td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 46 · #10 Browser checks</b>
+    <ul>
+      <li>What it is: the browser half of the manual check list</li>
+      <li>Why: #10's first AC, "Every item on the manual check list passes on localhost"</li>
+      <li>Files: none changed</li>
+      <li>Its role in the project: with Entry 45, closes #10's first AC</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 46 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>keyboard only]:::run
+  PG[app/page.tsx]:::entry
+  NV[components/Navigator.tsx<br/>handlers, status line, focus]:::ui
+  SL[components/SavedList.tsx<br/>cards, headings]:::ui
+  RS[app/api/searches/route.ts<br/>GET, POST]:::server
+  RI[app/api/searches/id/route.ts<br/>PATCH, DELETE]:::server
+  DB[lib/db.ts<br/>Prisma to Neon]:::db
+  BR --> PG
+  PG --> NV
+  NV -->|fetch| RS
+  NV -->|fetch| RI
+  RS --> DB
+  RI --> DB
+  DB -->|rows| RS
+  RS -->|refetch list| NV
+  NV --> SL
+  SL -->|focus and status| BR
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef db fill:#111827,color:#fff,stroke:#9ca3af
 ```
