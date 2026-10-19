@@ -233,6 +233,8 @@ export default function Navigator() {
     try {
       setSearches(await fetchSearches());
     } catch {
+      // No new list, so no card to focus; a later refetch must not jump to it. [A2]
+      focusAfterSave.current = null;
       setListStatus("error");
     }
     return null;

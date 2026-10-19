@@ -3816,7 +3816,7 @@ flowchart TD
       <li><code>.gitignore</code> has <code>.env*</code> and <code>!.env.example</code>; <code>gh api …/contents/.env</code>: HTTP 404</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>823d5a3</code> pushed to main (<code>9ba1c7e..823d5a3</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: proves the server rules in the spec hold when the routes are called directly, without the UI</li>
@@ -3895,7 +3895,7 @@ flowchart TD
       <li>Check 5, saved cards part: N/A, #9 cut (cut 1), cards show no counts</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>823d5a3</code> pushed to main (<code>9ba1c7e..823d5a3</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: proves the app behaves as the spec says from the user's side: persistence, network statuses, focus and announcements</li>
@@ -3948,4 +3948,145 @@ flowchart TD
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef db fill:#111827,color:#fff,stroke:#9ca3af
+```
+
+## Entry 47 · #10 Code review against the spec
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · skill <code>code-review</code> (two parallel sub-agents: Standards, Spec)</td></tr>
+  <tr><td><b>Asked</b></td><td>"go": step G3, run <code>code-review</code> against <code>docs/spec/</code> since the first commit</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Diff <code>d5beecf...HEAD</code>, 34 files, excluding <code>PROMPT_LOG.md</code>, <code>SOT_documents/</code>, <code>docs/assets/</code>, <code>package-lock.json</code></li>
+      <li>Standards: <code>CLAUDE.md</code> Stack and Hard rules, plus the Fowler smell baseline</li>
+      <li>Spec: <code>docs/spec/requirements.md</code>, <code>design.md</code>, <code>tasks.md</code>, issues #1–#8</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>No files changed (read-only review)</td></tr>
+  <tr><td><b>Decision</b></td><td>accepted · Joseph agreed with the fix/skip split</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li>Standards: 0 hard violations; 6 judgement calls (duplicated error and fetch code, <code>retry</code> name, <code>county: string</code>, hand-copied <code>SavedSearch</code> type, focus ref, minor <code>/api/types</code> notes)</li>
+      <li>Spec: no high-severity gaps; 11 findings, worst the leftover focus request (same as Standards)</li>
+      <li>Agent confirmed in code: <code>Navigator.tsx:232–236</code> never clears <code>focusAfterSave</code> on a failed refetch; <code>ResultCard.tsx:68</code> says "the other license type"</li>
+      <li>Fix: focus ref (G4a), empty-state wording (G4b), #7 checkboxes (G5). Skip: <code>idParam</code> leniency, refactors, P3/P4/P6/P8–P11</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: checks the code itself against the rules and the spec, to find what click tests can't</li>
+      <li>Input: the diff since the root commit, <code>CLAUDE.md</code>, <code>docs/spec/</code>, issues #1–#8</li>
+      <li>Output: two separate reports (Standards, Spec) and a fix/skip list</li>
+      <li>Flow: <code>git diff</code> → Standards sub-agent and Spec sub-agent in parallel → two reports → agent checks the top findings in code → Joseph decides fix or skip</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>none</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 47 · #10 Code review against the spec</b>
+    <ul>
+      <li>What it is: the two-axis review of the whole build</li>
+      <li>Why: #10's second AC, "<code>code-review</code> has run; each finding is fixed or recorded as skipped with a reason"</li>
+      <li>Files: none changed</li>
+      <li>Its role in the project: feeds the G4 fixes and the skip list posted on #10</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 47 call graph
+
+```mermaid
+flowchart TD
+  AG[Claude Code<br/>code-review skill]:::tool
+  ST[Standards sub-agent<br/>CLAUDE.md + smells]:::tool
+  SP[Spec sub-agent<br/>docs/spec + issues]:::tool
+  NV[components/Navigator.tsx<br/>focusAfterSave]:::ui
+  RC[components/ResultCard.tsx<br/>empty state wording]:::ui
+  JO[Joseph<br/>fix or skip]:::run
+  AG --> ST
+  AG --> SP
+  ST -->|report| AG
+  SP -->|report| AG
+  AG -->|confirmed| NV
+  AG -->|confirmed| RC
+  AG --> JO
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+```
+
+## Entry 48 · #10 Clear the leftover focus request
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"agree, G4a": fix the focus finding from G3</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li><code>components/Navigator.tsx</code>: <code>handleSave</code> and the focus effect at lines 70–74</li>
+      <li><code>docs/spec/design.md</code> Focus [A2]</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · in <code>handleSave</code>'s refetch <code>catch</code>, <code>focusAfterSave.current = null</code> with a one-line comment</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>npx eslint components/Navigator.tsx</code>: no output</li>
+      <li>The failure path (Neon fails between POST and refetch) has no reliable click test; checked by reading the code</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: if the list fails to reload right after a save, focus does not jump to that card later during an unrelated edit, delete or Try again</li>
+      <li>Input: none new; runs only when <code>fetchSearches()</code> throws inside <code>handleSave</code></li>
+      <li>Output: <code>focusAfterSave.current</code> back to <code>null</code>, so the focus effect does nothing on the next list change</li>
+      <li>Flow: Save → <code>POST /api/searches</code> 201 → <code>focusAfterSave = id</code> → <code>GET /api/searches</code> fails → ref cleared → list error card → Try again → list loads → focus stays put</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>The browser checks showed that the app works today. In G3, the review read the code itself, comparing every line against the rules in <code>CLAUDE.md</code> and the promises in the spec docs. That's how we found a bug no click test would show, because it only appears when the database fails at the exact moment.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 48 · #10 Clear the leftover focus request</b>
+    <ul>
+      <li>What it is: a one-line fix in the save failure path</li>
+      <li>Why: G3 finding P1/S5, flagged by both reviewers</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: <code>handleSave</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: keeps focus [A2] correct when Neon fails</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 48 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>Save]:::run
+  HS[components/Navigator.tsx<br/>handleSave]:::ui
+  RS[app/api/searches/route.ts<br/>POST, GET]:::server
+  FR[components/Navigator.tsx<br/>focusAfterSave ref]:::ui
+  FX[components/Navigator.tsx<br/>focus effect]:::ui
+  BR --> HS
+  HS -->|POST 201| RS
+  HS -->|set id| FR
+  HS -->|GET fails| RS
+  HS -->|clear| FR
+  FR --> FX
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
 ```

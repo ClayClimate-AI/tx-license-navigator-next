@@ -1,4 +1,4 @@
-stage: F
-step: F4 (4 of 4) done, #7 ready to close
-issue: #7
-title: License types error state
+stage: G
+step: G4a (4 of 5) done, G4b next
+issue: #10
+title: Done check
