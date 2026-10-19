@@ -4195,7 +4195,7 @@ flowchart TD
       <li><code>npx eslint app/layout.tsx app/page.tsx</code>: no output</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>not yet committed</td></tr>
+  <tr><td><b>Commit</b></td><td><code>8620348</code> pushed to main (<code>a414b73..8620348</code>)</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the navy footer stays at the bottom of the window on short pages, so it no longer jumps when a card is saved or deleted</li>

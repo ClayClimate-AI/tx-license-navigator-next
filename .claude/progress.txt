@@ -1,4 +1,4 @@
 stage: G
-step: G4c (4 of 5) done, G5 next
+step: G5 (5 of 5) written, waiting for accept and Closes #10 commit
 issue: #10
 title: Done check
