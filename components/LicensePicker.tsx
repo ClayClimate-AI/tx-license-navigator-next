@@ -1,12 +1,14 @@
 import { COUNTIES } from "@/lib/counties";
 
-// The two HVAC types for #6. #7 adds the live list of other types under its own group.
+// Pinned in the "HVAC" group at the top; the live TDLR list fills the rest. [S1]
 export const HVAC_TYPES = ["A/C Technician", "A/C Contractor"];
 
 // mt-auto pins each select to the bottom of its column so both line up when a hint wraps.
 const selectClass = "mt-auto w-full rounded border-2 bg-white px-3 py-2.5 text-[16px]";
 
 type Props = {
+  types: string[];
+  typesLoading: boolean;
   type: string;
   county: string;
   onTypeChange: (type: string) => void;
@@ -17,7 +19,10 @@ type Props = {
 };
 
 // The search form, ported from Week 4. Navigator owns the values; this only shows them. [S2]
-export default function LicensePicker({ type, county, onTypeChange, onCountyChange, onSubmit, busy, fieldError }: Props) {
+export default function LicensePicker({ types, typesLoading, type, county, onTypeChange, onCountyChange, onSubmit, busy, fieldError }: Props) {
+  // Exact string match, so "A/C CE Provider" never lands in the HVAC group.
+  const others = types.filter((t) => !HVAC_TYPES.includes(t));
+
   return (
     <form
       onSubmit={(e) => {
@@ -41,10 +46,20 @@ export default function LicensePicker({ type, county, onTypeChange, onCountyChan
               aria-describedby="license-type-hint"
               value={type}
               onChange={(e) => onTypeChange(e.target.value)}
+              disabled={typesLoading}
             >
-              <optgroup label="HVAC">
-                {HVAC_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </optgroup>
+              {typesLoading ? (
+                <option value="">Loading license types…</option>
+              ) : (
+                <>
+                  <optgroup label="HVAC">
+                    {HVAC_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </optgroup>
+                  <optgroup label="All other license types">
+                    {others.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </optgroup>
+                </>
+              )}
             </select>
           </div>
           <div className="flex flex-col">

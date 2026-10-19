@@ -3491,7 +3491,7 @@ flowchart TD
       <li>502 and 504 paths not forced in this step; F4 checks the error behaviour</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>2caced3</code> feat: GET /api/types with 502 and 504; prompt log entry 41</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the browser can get the live type list without calling TDLR itself [P1]</li>
@@ -3534,6 +3534,85 @@ flowchart TD
   RT -->|TdlrError| E502
   RT -->|timedOut| E504
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+```
+
+## Entry 42 · #7 Live type list in LicensePicker
+
+*Oct 18 · ~19:35 CT, checked after a break*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>Step F3 only: <code>Navigator</code> loads <code>/api/types</code> on page load; <code>LicensePicker</code> shows "HVAC" first, then "All other license types", with "Loading license types…" while it loads</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #7 ACs; <code>docs/spec/requirements.md</code> S1; <code>docs/spec/design.md</code> component state</li>
+      <li>Week 4 <code>src/components/LicensePicker.jsx</code> and <code>src/App.jsx</code> (<code>loadTypes</code>), read with <code>gh api</code> (read only)</li>
+      <li><code>components/Navigator.tsx</code> saved-list effect (the <code>cancelled</code> guard to reuse)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    2 files modified
+    <ul>
+      <li>🟩 <code>components/LicensePicker.tsx</code> (modified) · new props <code>types</code>, <code>typesLoading</code> · select disabled with one "Loading license types…" option while loading · <code>&lt;optgroup label="HVAC"&gt;</code> then <code>&lt;optgroup label="All other license types"&gt;</code> · <code>others</code> filters out <code>HVAC_TYPES</code> by exact string</li>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · <code>types</code> and <code>typesLoading</code> state · <code>useEffect</code> fetches <code>/api/types</code> once with a <code>cancelled</code> guard · passes both props down; a failed load leaves only HVAC until F4</li>
+      <li>Changed from Week 4: HVAC group always shows both pinned types; the search's own loading state is separate from the type loading</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output · <code>npx eslint</code> on both files: no output</li>
+      <li><code>curl -s localhost:3000 | grep</code>: first render has "Loading license types…"</li>
+      <li>Joseph in the browser: "Loading license types…" on reload; "HVAC" first, then "All other license types", A/C Technician once; Apprentice Electrician in Travis County shows 11,950</li>
+      <li>Joseph saw the h1, intro, header subtitle and type hint still say HVAC; fix is step F3b</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the visitor can search any of the top 50 license types, not just the two HVAC ones [S1]</li>
+      <li>Input: <code>Navigator</code> gets <code>{ types: [{ name, holders }] }</code> from <code>/api/types</code>; <code>LicensePicker</code> gets <code>types</code> (names) and <code>typesLoading</code></li>
+      <li>Output: a select with "HVAC" (2) first and "All other license types" (48) below</li>
+      <li>Flow: page load → <code>Navigator</code> <code>useEffect</code> → <code>fetch("/api/types")</code> → <code>route.ts</code> → <code>fetchTopTypes</code> → TDLR → JSON → <code>setTypes</code> → <code>LicensePicker</code> re-renders</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>All checks passed. On page load, <code>Navigator</code> uses <code>useEffect</code>, which automatically fetches <code>/api/types</code>, using <code>route.ts</code>. <code>route.ts</code> calls <code>fetchTopTypes</code>, a function in <code>lib/tdlr.ts</code>. That request goes to the TDLR API, where we group by type, and TDLR sends back the top 50 by name and number of holders. <code>Navigator</code>'s <code>setTypes</code> receives that information back as JSON, and it's passed down to <code>LicensePicker</code> as props, <code>types</code> and <code>typesLoading</code>. So the server now fetches the 50 biggest license types from TDLR, and the page shows them with HVAC pinned first, so a visitor can check demand for any common Texas license, not just HVAC. We're also changing the heading wording, because it makes the application look like it's mainly for searching HVAC information. In truth it should be useful for anyone looking for license holders in different trades in different locations.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 42 · #7 Live type list in LicensePicker</b>
+    <ul>
+      <li>What it is: the type select filled from the live list instead of a fixed two</li>
+      <li>Why: S1; two types made the app feel thin</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: owns <code>types</code>, <code>typesLoading</code>, the load effect</li>
+          <li><code>components/LicensePicker.tsx</code>: draws the two groups from props</li>
+        </ul>
+      </li>
+      <li>Its role in the project: state up in <code>Navigator</code>, props down to the picker, same split as the saved list</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 42 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>page load]:::run
+  NV[components/Navigator.tsx<br/>useEffect, types, typesLoading]:::ui
+  RT[app/api/types/route.ts<br/>GET]:::server
+  FT[lib/tdlr.ts<br/>fetchTopTypes]:::tdlr
+  LP[components/LicensePicker.tsx<br/>HVAC, then All other license types]:::ui
+  BR --> NV
+  NV -->|fetch /api/types| RT
+  RT --> FT
+  FT -->|name, holders x 50| RT
+  RT -->|types JSON| NV
+  NV -->|types, typesLoading props| LP
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
   classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
   classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```

@@ -22,6 +22,9 @@ async function fetchSearches(): Promise<SavedSearch[]> {
 
 // Owns the page state, like Week 4's App.jsx: the search, the saved list, and the status line.
 export default function Navigator() {
+  // Live type names from GET /api/types; the select shows "Loading license types…" until they arrive. [S1]
+  const [types, setTypes] = useState<string[]>([]);
+  const [typesLoading, setTypesLoading] = useState(true);
   const [type, setType] = useState(HVAC_TYPES[0]);
   const [county, setCounty] = useState("");
   const [fieldError, setFieldError] = useState("");
@@ -53,6 +56,25 @@ export default function Navigator() {
     document.getElementById(`saved-${focusAfterSave.current}-heading`)?.focus();
     focusAfterSave.current = null;
   }, [searches]);
+
+  // On page load: browser → GET /api/types → the select's two groups. [S1]
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/types", { cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`GET /api/types ${res.status}`);
+        const data: { types: { name: string }[] } = await res.json();
+        if (!cancelled) setTypes(data.types.map((t) => t.name));
+      })
+      // For now a failure leaves only the HVAC group; F4 adds the Week 4 error state.
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setTypesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Browser → GET /api/count → result card and status line. [S3–S7]
   async function runSearch(search: Search) {
@@ -210,6 +232,8 @@ export default function Navigator() {
   return (
     <>
       <LicensePicker
+        types={types}
+        typesLoading={typesLoading}
         type={type}
         county={county}
         onTypeChange={setType}
