@@ -1,4 +1,4 @@
-stage: E
-step: next issue #10 (after /clear)
-issue: #10
-title: Done check
+stage: F
+step: F4 (4 of 4) done, #7 ready to close
+issue: #7
+title: License types error state

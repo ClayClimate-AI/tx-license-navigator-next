@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { countyLabel } from "@/lib/counties";
 import LicensePicker, { HVAC_TYPES } from "./LicensePicker";
 import ResultCard, { type ResultStatus } from "./ResultCard";
@@ -18,6 +18,22 @@ async function fetchSearches(): Promise<SavedSearch[]> {
   if (!res.ok) throw new Error(`GET /api/searches ${res.status}`);
   const data: { searches: SavedSearch[] } = await res.json();
   return data.searches;
+}
+
+// code is TDLR's, or null for a timeout or no connection.
+type TypesAnswer = { ok: true; names: string[] } | { ok: false; code: number | null };
+
+// Never throws, so callers only choose what to show.
+async function fetchTypes(): Promise<TypesAnswer> {
+  try {
+    const res = await fetch("/api/types", { cache: "no-store" });
+    const data = await res.json();
+    if (!res.ok) return { ok: false, code: data.status };
+    return { ok: true, names: (data as { types: { name: string }[] }).types.map((t) => t.name) };
+  } catch {
+    // No connection, or a reply that was not JSON.
+    return { ok: false, code: null };
+  }
 }
 
 // Owns the page state, like Week 4's App.jsx: the search, the saved list, and the status line.
@@ -57,24 +73,33 @@ export default function Navigator() {
     focusAfterSave.current = null;
   }, [searches]);
 
-  // On page load: browser → GET /api/types → the select's two groups. [S1]
+  // Puts a GET /api/types answer on the page: the select's two groups, or the Week 4 error card. [S1, S6]
+  const showTypes = useCallback((answer: TypesAnswer) => {
+    if (answer.ok) {
+      setTypes(answer.names);
+      setStatus("idle");
+      setMessage("Ready. Choose a license type and a county.");
+    } else {
+      setErrorCode(answer.code);
+      setStatus("error");
+      setMessage(`Something went wrong (${answer.code === null ? "no connection" : `error ${answer.code}`}). Your choices are saved.`);
+    }
+    setTypesLoading(false);
+  }, []);
+
+  // On page load. The flag keeps StrictMode's double run in dev from applying two answers.
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/types", { cache: "no-store" })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`GET /api/types ${res.status}`);
-        const data: { types: { name: string }[] } = await res.json();
-        if (!cancelled) setTypes(data.types.map((t) => t.name));
-      })
-      // For now a failure leaves only the HVAC group; F4 adds the Week 4 error state.
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setTypesLoading(false);
-      });
+    fetchTypes().then((answer) => {
+      if (!cancelled) showTypes(answer);
+    });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [showTypes]);
+
+  // As in Week 4, a failed type list hides the form instead of showing one that can't be used.
+  const typesFailed = !typesLoading && types.length === 0;
 
   // Browser → GET /api/count → result card and status line. [S3–S7]
   async function runSearch(search: Search) {
@@ -106,6 +131,18 @@ export default function Navigator() {
     setErrorCode(code);
     setStatus("error");
     setMessage(`Something went wrong (${code === null ? "no connection" : `error ${code}`}). Your choices are saved.`);
+  }
+
+  // Try again reloads the types if they never arrived; otherwise it repeats the last search.
+  function handleRetry() {
+    if (types.length === 0) {
+      setTypesLoading(true);
+      setStatus("loading");
+      setMessage("Checking Texas license records.");
+      fetchTypes().then(showTypes);
+    } else if (lastSearch) {
+      runSearch(lastSearch);
+    }
   }
 
   function handleSubmit() {
@@ -231,17 +268,19 @@ export default function Navigator() {
 
   return (
     <>
-      <LicensePicker
-        types={types}
-        typesLoading={typesLoading}
-        type={type}
-        county={county}
-        onTypeChange={setType}
-        onCountyChange={handleCountyChange}
-        onSubmit={handleSubmit}
-        busy={status === "loading"}
-        fieldError={fieldError}
-      />
+      {!typesFailed && (
+        <LicensePicker
+          types={types}
+          typesLoading={typesLoading}
+          type={type}
+          county={county}
+          onTypeChange={setType}
+          onCountyChange={handleCountyChange}
+          onSubmit={handleSubmit}
+          busy={status === "loading"}
+          fieldError={fieldError}
+        />
+      )}
       {/* Screen readers announce changes here without moving focus. */}
       <p role="status" className="mt-4 min-h-6 text-[15px] font-semibold text-[#14304F]">
         {message}
@@ -253,7 +292,7 @@ export default function Navigator() {
         count={result?.count ?? 0}
         queryUrl={result?.queryUrl ?? ""}
         errorCode={errorCode}
-        onRetry={() => lastSearch && runSearch(lastSearch)}
+        onRetry={handleRetry}
         onSave={handleSave}
       />
       <SavedList searches={searches} status={listStatus} onRetry={retry} onDelete={handleDelete} onEdit={handleEdit} />

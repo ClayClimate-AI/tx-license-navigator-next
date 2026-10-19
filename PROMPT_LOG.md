@@ -3647,7 +3647,7 @@ flowchart TD
       <li><code>grep -rn -i "hvac license" app components README.md</code>: no matches</li>
     </ul>
   </td></tr>
-  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>Commit</b></td><td><code>da1304a</code> docs: page wording covers all license types; prompt log entry 43</td></tr>
   <tr><td><b>PIOF and what differed</b></td><td>
     <ul>
       <li>Purpose: the page says it covers any common Texas license, matching the select from F3</li>
@@ -3686,4 +3686,99 @@ flowchart TD
   NV --> LP
   classDef entry fill:#1d4ed8,color:#fff,stroke:#93c5fd
   classDef ui fill:#15803d,color:#fff,stroke:#86efac
+```
+
+## Entry 44 · #7 License types error state
+
+*Oct 19*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5</td></tr>
+  <tr><td><b>Asked</b></td><td>"continue": step F4 only, the Week 4 error behaviour when the license types fail to load (last AC of #7)</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Issue #7 ACs; <code>SOT_documents/UI.md</code> Part 1 (error card, status line)</li>
+      <li>Week 4 <code>src/App.jsx</code> (<code>loadTypes</code>, <code>typesFailed</code>, <code>handleRetry</code>) and <code>src/components/StatusMessage.jsx</code>, read only</li>
+      <li><code>app/api/types/route.ts</code>: 502/504 reply <code>{ error, status }</code></li>
+      <li><code>components/Navigator.tsx</code>: <code>fetchSearches</code> pattern reused</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li>🟩 <code>components/Navigator.tsx</code> (modified) · new <code>fetchTypes()</code> outside the component returns a <code>TypesAnswer</code> (names, or a failure with TDLR's code or <code>null</code>) and never throws · <code>showTypes</code> (<code>useCallback</code>) fills the groups or sets the error card and status line · page-load effect runs <code>fetchTypes().then(showTypes)</code> · <code>typesFailed</code> hides <code>LicensePicker</code> · <code>handleRetry</code> reloads the types if none arrived, else repeats the last search</li>
+      <li>Changed from Week 4: the page-load types request no longer shows the result card's loading state; only Try again does</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npx tsc --noEmit</code>: no output</li>
+      <li><code>npx eslint components/Navigator.tsx</code>: first <code>react-hooks/set-state-in-effect</code> error, fixed by moving the fetch outside the component; then no output</li>
+      <li>Joseph's screenshot with Wi-Fi off: form hidden, "Something went wrong (no connection). Your choices are saved.", error card "(no connection)" with focus ring on its heading</li>
+      <li><code>curl -s localhost:3000/api/types | jq '.types | length'</code>: <code>0</code> on the first run, then HTTP 200 with the full list and <code>50</code></li>
+      <li>Joseph: "all checks pass" (Try again brings the form back; Try again after a failed search repeats the search)</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td>pending</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: if TDLR fails while the license types load, the visitor sees the Week 4 error card and Try again instead of a half-filled select</li>
+      <li>Input: the <code>/api/types</code> reply: 200 <code>{ types }</code>, 502/504 <code>{ error, status }</code>, or no connection</li>
+      <li>Output: on success the two groups; on failure the form is hidden, the error card shows the code or "(no connection)", and the status line says "Something went wrong (…)"</li>
+      <li>Flow: page load → <code>useEffect</code> → <code>fetchTypes</code> → <code>route.ts</code> → <code>fetchTopTypes</code> → TDLR → <code>TypesAnswer</code> → <code>showTypes</code> → <code>LicensePicker</code> or <code>ResultCard</code> → Try again → <code>handleRetry</code> → <code>fetchTypes</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Tutor</b></td><td>
+    <ul>
+      <li>Not understood: Joseph thought the effect calls <code>fetchTypes</code> again on Try again</li>
+      <li>Cleared up: the effect runs once, on page load; Try again runs <code>handleRetry</code>, which calls <code>fetchTypes().then(showTypes)</code>. The error card shows in two cases: the server answered but TDLR failed (502, or 504 if too slow), or the server couldn't be reached (no code)</li>
+      <li>Resolved: he restated the Try again path: no types → <code>fetchTypes</code> → the route asks TDLR again → <code>showTypes</code> fills the dropdown → <code>typesFailed</code> turns false → the form appears</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>I'm assuming the effect calls <code>fetchTypes</code> again and tells it to go get the types and give the answer to <code>showTypes</code>. <code>fetchTypes</code> uses the URL <code>/api/types</code>, and Next.js runs the code at that location that matches the request's method. That request is the route asking TDLR for the top 50 types. Once they're received, <code>fetchTypes</code> returns the list, <code>showTypes</code> fills in the two groups in the dropdown, and the form appears. The reason the user is told when the server, or TDLR, can't be reached is that an error message that tells the user what's going on beats giving them a form or a dropdown that can't be used. That would be pointless.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 44 · #7 License types error state</b>
+    <ul>
+      <li>What it is: the failure path for the license type list</li>
+      <li>Why: #7's last AC, "If TDLR fails, the page shows the Week 4 error behaviour for types"</li>
+      <li>Files:
+        <ul>
+          <li><code>components/Navigator.tsx</code>: <code>fetchTypes</code>, <code>showTypes</code>, <code>typesFailed</code>, <code>handleRetry</code></li>
+        </ul>
+      </li>
+      <li>Its role in the project: closes #7; one Try again button serves both the types and the search</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 44 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>page load or Try again]:::run
+  NV[components/Navigator.tsx<br/>useEffect, handleRetry]:::ui
+  FT[components/Navigator.tsx<br/>fetchTypes]:::ui
+  RT[app/api/types/route.ts<br/>GET]:::server
+  TD[lib/tdlr.ts<br/>fetchTopTypes]:::tdlr
+  API[TDLR API]:::run
+  ST[components/Navigator.tsx<br/>showTypes]:::ui
+  LP[components/LicensePicker.tsx<br/>two groups]:::ui
+  RC[components/ResultCard.tsx<br/>error card, Try again]:::ui
+  BR --> NV
+  NV --> FT
+  FT -->|fetch /api/types| RT
+  RT --> TD
+  TD --> API
+  API -->|top 50 or error| TD
+  RT -->|200 types or 502/504 status| FT
+  FT -->|TypesAnswer| ST
+  ST -->|ok| LP
+  ST -->|failed| RC
+  RC -->|Try again| NV
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+  classDef ui fill:#15803d,color:#fff,stroke:#86efac
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
 ```
