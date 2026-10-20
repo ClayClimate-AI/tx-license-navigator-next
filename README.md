@@ -11,6 +11,8 @@ Week 5 rebuild of the Week 4 app in Next.js, adding a saved-searches watchlist s
 
 **Live:** https://tx-license-navigator-next.netlify.app
 
+**Supporting artifact:** [Architecture and data flow walkthrough](https://tx-license-navigator-architecture-data-flow.netlify.app), shows how the app was built and how each request moves through it.
+
 ## What it does
 
 - **Search:** pick a license type and one of 13 Texas counties, get the live number of license holders there.
