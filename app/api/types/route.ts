@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { fetchTopTypes, TdlrError } from "@/lib/tdlr";
 
 const TDLR_ERROR = "We could not reach the Texas data service.";
@@ -5,6 +6,8 @@ const TDLR_ERROR = "We could not reach the Texas data service.";
 // GET /api/types: the top 50 license types by holder count, largest first. [S1]
 // No input, so there is nothing for Zod to check here.
 export async function GET() {
+  // Run per request: without this, the build tries to prerender this route and its abort of the TDLR fetch logs a false error.
+  await connection();
   try {
     const types = await fetchTopTypes();
     return Response.json({ types });
