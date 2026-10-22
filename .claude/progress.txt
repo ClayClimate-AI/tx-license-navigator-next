@@ -1,4 +1,4 @@
-stage: H
-step: H3 (3 of 3) done; #11 closed (ef5064a); log entry 52 in b91e932
-issue: #11
-title: Deploy to Netlify · closed
+stage: I
+step: I1 (1 of 1) done; fix in 8f4b72b; log entry 54
+issue: none
+title: Stop false TDLR error in build (await connection in /api/types)

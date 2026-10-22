@@ -4480,3 +4480,74 @@ flowchart TD
   classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
   classDef run fill:#334155,color:#fff,stroke:#94a3b8
 ```
+
+## Entry 54 · no issue · /api/types skips the build prerender
+
+*Oct 22*
+
+<table>
+  <tr><th align="left">Field</th><th align="left">Details</th></tr>
+  <tr><td><b>Tool</b></td><td>Claude Code · claude-opus-5-5 · <code>gh</code></td></tr>
+  <tr><td><b>Asked</b></td><td>"lets address the error" (then "without an issue")</td></tr>
+  <tr><td><b>Context</b></td><td>
+    <ul>
+      <li>Health check: <code>npm run build</code> passed but logged <code>GET /api/types failed: Could not reach TDLR</code></li>
+      <li><code>next.config.ts</code>: <code>cacheComponents: true</code></li>
+      <li>Next.js docs in <code>node_modules/next/dist/docs</code>: with Cache Components, a <code>GET</code> route that reads no request data is prerendered at build, and prerendering stops at uncached data</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Changed</b></td><td>
+    1 file modified
+    <ul>
+      <li><code>app/api/types/route.ts</code> · imports <code>connection</code> from <code>next/server</code>; <code>await connection()</code> is the first line of <code>GET</code></li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Decision</b></td><td>accepted</td></tr>
+  <tr><td><b>Verified</b></td><td>
+    <ul>
+      <li><code>npm run build</code>: no <code>GET /api/types failed</code> line; <code>/api/types</code> still ƒ (dynamic)</li>
+      <li><code>npm run lint</code>: clean</li>
+      <li>Joseph's <code>npm run dev</code>: license type dropdown filled (one <code>GET /api/types 200 in 440ms</code>); three <code>504</code>s logged <code>TDLR did not answer within 8 seconds</code></li>
+      <li>Same types query sent straight to TDLR: 0.6 s, then 4.7 s, so the 504s are TDLR's speed, not this change</li>
+      <li>CI run <code>39807838829</code> on <code>8f4b72b</code>: passed</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Commit</b></td><td><code>8f4b72b</code> on main; this entry follows in a log-only commit</td></tr>
+  <tr><td><b>PIOF and what differed</b></td><td>
+    <ul>
+      <li>Purpose: the build, CI, and Netlify logs stop showing a false TDLR error, so a real one stands out</li>
+      <li>Input: none new; <code>connection()</code> takes no arguments</li>
+      <li>Output: unchanged: <code>{ types }</code> with 200, or the error JSON with 502 or 504</li>
+      <li>Flow: browser <code>fetch('/api/types')</code> → <code>route.ts</code> → <code>await connection()</code> → <code>fetchTopTypes()</code> → TDLR API → JSON → React state</li>
+    </ul>
+  </td></tr>
+  <tr><td><b>Reflection</b></td><td>Next.js was trying to prerender <code>/api/types</code> at build time. Prerendering would have saved stale data, so Next.js cut off the live TDLR call, and our error handler logged it as a false "Could not reach TDLR." I resolved it by adding <code>await connection()</code>, which skips prerendering so the route runs fresh on every request.</td></tr>
+  <tr><td><b>Explained</b></td><td>
+    <b>Entry 54 · /api/types skips the build prerender</b>
+    <ul>
+      <li>What it is: one call that marks the route as request-time only</li>
+      <li>Why: the build's prerender aborted the TDLR fetch on purpose, and the route's <code>catch</code> logged that abort as a failure</li>
+      <li>Files: <code>app/api/types/route.ts</code></li>
+      <li>Its role in the project: clean build logs before Week 6 work; real TDLR slowness (the dev 504s) is a separate, open caching question</li>
+    </ul>
+  </td></tr>
+</table>
+
+### Entry 54 call graph
+
+```mermaid
+flowchart TD
+  BR[Browser<br/>LicensePicker load]:::run
+  RT[app/api/types/route.ts<br/>GET]:::server
+  CN[connection<br/>request time only]:::tool
+  TD[lib/tdlr.ts<br/>fetchTopTypes]:::tdlr
+  API[TDLR API<br/>top 50 types]:::run
+  BR -->|fetch /api/types| RT
+  RT -->|await first| CN
+  RT --> TD
+  TD -->|8 s timeout| API
+  classDef server fill:#b91c1c,color:#fff,stroke:#fca5a5
+  classDef tdlr fill:#78350f,color:#fff,stroke:#d6a77a
+  classDef tool fill:#7e22ce,color:#fff,stroke:#d8b4fe
+  classDef run fill:#334155,color:#fff,stroke:#94a3b8
+```
